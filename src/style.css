@@ -1,0 +1,285 @@
+/* ======================================================================
+   src/style.css — PROSJEKTETS STIL
+   Mobile-first: grunnstilen gjelder minste skjerm, og vi bygger oppover
+   med min-width. Mørk bakgrunn som utgangspunkt.
+
+   Eier: Malin (app-skall). Dette er et startpunkt — bygg videre.
+   ====================================================================== */
+
+/* ---------- tokens ------------------------------------------------- */
+
+:root {
+	--bg: #12151a;
+	--flate: #1b1f26;
+	--flate-hover: #232833;
+	--kant: #2c323d;
+	--tekst: #e6e9ee;
+	--tekst-dempet: #9aa4b2;
+	--aksent: #4c9aff;
+	--aksent-tekst: #0b1220;
+
+	--radius: 10px;
+	--luft-1: 0.5rem;
+	--luft-2: 1rem;
+	--luft-3: 1.5rem;
+	--maksbredde: 60rem;
+}
+
+/* ---------- grunnlag ------------------------------------------------ */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--tekst);
+	font-family: system-ui, sans-serif;
+	line-height: 1.5;
+}
+
+:focus-visible {
+	outline: 2px solid var(--aksent);
+	outline-offset: 2px;
+}
+
+/* Synlig for skjermleser, skjult visuelt. */
+.visuelt-skjult {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+/* ---------- topplinje ----------------------------------------------- */
+
+.topplinje {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--luft-2);
+	padding: var(--luft-2);
+	border-bottom: 1px solid var(--kant);
+}
+
+.logo {
+	color: var(--tekst);
+	font-size: 1.25rem;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	text-decoration: none;
+}
+
+/* ---------- skjerm --------------------------------------------------- */
+
+.skjerm {
+	max-width: var(--maksbredde);
+	margin: 0 auto;
+	padding: var(--luft-2);
+	display: flex;
+	flex-direction: column;
+	gap: var(--luft-2);
+}
+
+.sidetittel {
+	margin: 0;
+	font-size: 1.5rem;
+}
+
+.tellerlinje,
+.tom {
+	margin: 0;
+	color: var(--tekst-dempet);
+	font-size: 0.9rem;
+}
+
+/* ---------- felt og knapper ------------------------------------------ */
+
+.felt {
+	width: 100%;
+	padding: 0.6rem 0.75rem;
+	background: var(--flate);
+	border: 1px solid var(--kant);
+	border-radius: var(--radius);
+	color: var(--tekst);
+	font: inherit;
+}
+
+.knapp {
+	padding: 0.6rem 1rem;
+	background: var(--flate);
+	border: 1px solid var(--kant);
+	border-radius: var(--radius);
+	color: var(--tekst);
+	font: inherit;
+	cursor: pointer;
+}
+
+.knapp:hover {
+	background: var(--flate-hover);
+}
+
+.knapp--primar {
+	background: var(--aksent);
+	border-color: var(--aksent);
+	color: var(--aksent-tekst);
+	font-weight: 600;
+}
+
+.knapp--diskret {
+	align-self: flex-start;
+	background: none;
+	border-color: transparent;
+	color: var(--tekst-dempet);
+	padding-left: 0;
+}
+
+/* ---------- søkelinje ------------------------------------------------ */
+
+.sokelinje {
+	display: flex;
+	flex-direction: column;
+	gap: var(--luft-1);
+}
+
+/* ---------- annonseliste --------------------------------------------- */
+
+.annonseliste {
+	display: grid;
+	gap: var(--luft-2);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.kort__knapp {
+	display: grid;
+	gap: 0.25rem;
+	width: 100%;
+	padding: var(--luft-2);
+	background: var(--flate);
+	border: 1px solid var(--kant);
+	border-radius: var(--radius);
+	color: inherit;
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.kort__knapp:hover {
+	background: var(--flate-hover);
+}
+
+.kort__tittel {
+	font-weight: 600;
+}
+
+.kort__pris {
+	color: var(--aksent);
+	font-variant-numeric: tabular-nums;
+}
+
+.kort__meta {
+	color: var(--tekst-dempet);
+	font-size: 0.85rem;
+}
+
+/* ---------- detaljvisning -------------------------------------------- */
+
+.detalj {
+	padding: var(--luft-3);
+	background: var(--flate);
+	border: 1px solid var(--kant);
+	border-radius: var(--radius);
+}
+
+.detalj__tittel {
+	margin: 0 0 var(--luft-1);
+	font-size: 1.5rem;
+}
+
+.detalj__pris {
+	margin: 0 0 var(--luft-2);
+	color: var(--aksent);
+	font-size: 1.25rem;
+	font-weight: 600;
+}
+
+.detalj__fakta {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 0.25rem var(--luft-2);
+	margin: 0 0 var(--luft-2);
+	font-size: 0.9rem;
+}
+
+.detalj__fakta dt {
+	color: var(--tekst-dempet);
+}
+
+.detalj__fakta dd {
+	margin: 0;
+}
+
+.detalj__beskrivelse {
+	margin: 0;
+}
+
+/* ---------- skjema ---------------------------------------------------- */
+
+.skjema {
+	display: flex;
+	flex-direction: column;
+	gap: var(--luft-2);
+}
+
+.skjema__rad {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	margin: 0;
+}
+
+.skjema__rad label {
+	color: var(--tekst-dempet);
+	font-size: 0.9rem;
+}
+
+/* ---------- tablet ---------------------------------------------------- */
+
+@media (min-width: 768px) {
+	.sokelinje {
+		flex-direction: row;
+	}
+
+	.sokelinje .felt:first-of-type {
+		flex: 1;
+	}
+
+	.annonseliste {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.skjema {
+		max-width: 34rem;
+	}
+}
+
+/* ---------- desktop --------------------------------------------------- */
+
+@media (min-width: 1024px) {
+	.topplinje {
+		padding: var(--luft-2) var(--luft-3);
+	}
+
+	.annonseliste {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}

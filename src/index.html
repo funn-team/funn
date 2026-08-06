@@ -1,12 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title></title>
+		<title>funn</title>
 		<link href="./style.css" rel="stylesheet">
 	</head>
 	<body>
-	
+		<!-- #app er rot for view-laget. Alle klikk fanges her (se view.js).
+		     Skjermene rendres inn i #main. -->
+		<div id="app">
+			<header class="topplinje">
+				<a class="logo" href="#" data-action="visListe">funn</a>
+				<button class="knapp knapp--primar" type="button" data-action="visNy">
+					Ny annonse
+				</button>
+			</header>
+
+			<main id="main"></main>
+		</div>
+
+		<script type="module" src="./js/app.js"></script>
 	</body>
 </html>

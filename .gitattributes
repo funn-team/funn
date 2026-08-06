@@ -1,0 +1,2 @@
+# Normaliser linjeskift, så fem maskiner ikke lager differ på hele filer.
+* text=auto eol=lf

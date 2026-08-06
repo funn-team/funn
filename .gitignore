@@ -1,0 +1,14 @@
+# Editors and local tooling
+.vscode/
+.idea/
+.zed/
+.claude/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node (om vi legger til verktøy senere)
+node_modules/
