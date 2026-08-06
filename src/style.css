@@ -1,31 +1,31 @@
 /* ======================================================================
-   src/style.css — PROSJEKTETS STIL
-   Mobile-first: grunnstilen gjelder minste skjerm, og vi bygger oppover
-   med min-width. Mørk bakgrunn som utgangspunkt.
+   src/style.css — PROJECT STYLES
+   Mobile-first: the base styles target the smallest screen, and we layer
+   up with min-width. Dark background as the starting point.
 
-   Eier: Malin (app-skall). Dette er et startpunkt — bygg videre.
+   Maintainer: see README. This is a starting point — build on it.
    ====================================================================== */
 
 /* ---------- tokens ------------------------------------------------- */
 
 :root {
 	--bg: #12151a;
-	--flate: #1b1f26;
-	--flate-hover: #232833;
-	--kant: #2c323d;
-	--tekst: #e6e9ee;
-	--tekst-dempet: #9aa4b2;
-	--aksent: #4c9aff;
-	--aksent-tekst: #0b1220;
+	--surface: #1b1f26;
+	--surface-hover: #232833;
+	--border: #2c323d;
+	--text: #e6e9ee;
+	--text-muted: #9aa4b2;
+	--accent: #4c9aff;
+	--accent-text: #0b1220;
 
 	--radius: 10px;
-	--luft-1: 0.5rem;
-	--luft-2: 1rem;
-	--luft-3: 1.5rem;
-	--maksbredde: 60rem;
+	--space-1: 0.5rem;
+	--space-2: 1rem;
+	--space-3: 1.5rem;
+	--max-width: 60rem;
 }
 
-/* ---------- grunnlag ------------------------------------------------ */
+/* ---------- base ---------------------------------------------------- */
 
 *,
 *::before,
@@ -36,18 +36,18 @@
 body {
 	margin: 0;
 	background: var(--bg);
-	color: var(--tekst);
+	color: var(--text);
 	font-family: system-ui, sans-serif;
 	line-height: 1.5;
 }
 
 :focus-visible {
-	outline: 2px solid var(--aksent);
+	outline: 2px solid var(--accent);
 	outline-offset: 2px;
 }
 
-/* Synlig for skjermleser, skjult visuelt. */
-.visuelt-skjult {
+/* Available to screen readers, hidden visually. */
+.visually-hidden {
 	position: absolute;
 	width: 1px;
 	height: 1px;
@@ -58,114 +58,114 @@ body {
 	white-space: nowrap;
 }
 
-/* ---------- topplinje ----------------------------------------------- */
+/* ---------- topbar --------------------------------------------------- */
 
-.topplinje {
+.topbar {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: var(--luft-2);
-	padding: var(--luft-2);
-	border-bottom: 1px solid var(--kant);
+	gap: var(--space-2);
+	padding: var(--space-2);
+	border-bottom: 1px solid var(--border);
 }
 
 .logo {
-	color: var(--tekst);
+	color: var(--text);
 	font-size: 1.25rem;
 	font-weight: 700;
 	letter-spacing: -0.02em;
 	text-decoration: none;
 }
 
-/* ---------- skjerm --------------------------------------------------- */
+/* ---------- screen --------------------------------------------------- */
 
-.skjerm {
-	max-width: var(--maksbredde);
+.screen {
+	max-width: var(--max-width);
 	margin: 0 auto;
-	padding: var(--luft-2);
+	padding: var(--space-2);
 	display: flex;
 	flex-direction: column;
-	gap: var(--luft-2);
+	gap: var(--space-2);
 }
 
-.sidetittel {
+.page-title {
 	margin: 0;
 	font-size: 1.5rem;
 }
 
-.tellerlinje,
-.tom {
+.result-count,
+.empty {
 	margin: 0;
-	color: var(--tekst-dempet);
+	color: var(--text-muted);
 	font-size: 0.9rem;
 }
 
-/* ---------- felt og knapper ------------------------------------------ */
+/* ---------- fields and buttons --------------------------------------- */
 
-.felt {
+.field {
 	width: 100%;
 	padding: 0.6rem 0.75rem;
-	background: var(--flate);
-	border: 1px solid var(--kant);
+	background: var(--surface);
+	border: 1px solid var(--border);
 	border-radius: var(--radius);
-	color: var(--tekst);
+	color: var(--text);
 	font: inherit;
 }
 
-.knapp {
+.button {
 	padding: 0.6rem 1rem;
-	background: var(--flate);
-	border: 1px solid var(--kant);
+	background: var(--surface);
+	border: 1px solid var(--border);
 	border-radius: var(--radius);
-	color: var(--tekst);
+	color: var(--text);
 	font: inherit;
 	cursor: pointer;
 }
 
-.knapp:hover {
-	background: var(--flate-hover);
+.button:hover {
+	background: var(--surface-hover);
 }
 
-.knapp--primar {
-	background: var(--aksent);
-	border-color: var(--aksent);
-	color: var(--aksent-tekst);
+.button--primary {
+	background: var(--accent);
+	border-color: var(--accent);
+	color: var(--accent-text);
 	font-weight: 600;
 }
 
-.knapp--diskret {
+.button--quiet {
 	align-self: flex-start;
 	background: none;
 	border-color: transparent;
-	color: var(--tekst-dempet);
+	color: var(--text-muted);
 	padding-left: 0;
 }
 
-/* ---------- søkelinje ------------------------------------------------ */
+/* ---------- search bar ----------------------------------------------- */
 
-.sokelinje {
+.search-bar {
 	display: flex;
 	flex-direction: column;
-	gap: var(--luft-1);
+	gap: var(--space-1);
 }
 
-/* ---------- annonseliste --------------------------------------------- */
+/* ---------- listing grid --------------------------------------------- */
 
-.annonseliste {
+.listing-grid {
 	display: grid;
-	gap: var(--luft-2);
+	gap: var(--space-2);
 	margin: 0;
 	padding: 0;
 	list-style: none;
 }
 
-.kort__knapp {
+.card__button {
 	display: grid;
 	gap: 0.25rem;
 	width: 100%;
-	padding: var(--luft-2);
-	background: var(--flate);
-	border: 1px solid var(--kant);
+	padding: var(--space-2);
+	background: var(--surface);
+	border: 1px solid var(--border);
 	border-radius: var(--radius);
 	color: inherit;
 	font: inherit;
@@ -173,113 +173,113 @@ body {
 	cursor: pointer;
 }
 
-.kort__knapp:hover {
-	background: var(--flate-hover);
+.card__button:hover {
+	background: var(--surface-hover);
 }
 
-.kort__tittel {
+.card__title {
 	font-weight: 600;
 }
 
-.kort__pris {
-	color: var(--aksent);
+.card__price {
+	color: var(--accent);
 	font-variant-numeric: tabular-nums;
 }
 
-.kort__meta {
-	color: var(--tekst-dempet);
+.card__meta {
+	color: var(--text-muted);
 	font-size: 0.85rem;
 }
 
-/* ---------- detaljvisning -------------------------------------------- */
+/* ---------- detail view ----------------------------------------------- */
 
-.detalj {
-	padding: var(--luft-3);
-	background: var(--flate);
-	border: 1px solid var(--kant);
+.detail {
+	padding: var(--space-3);
+	background: var(--surface);
+	border: 1px solid var(--border);
 	border-radius: var(--radius);
 }
 
-.detalj__tittel {
-	margin: 0 0 var(--luft-1);
+.detail__title {
+	margin: 0 0 var(--space-1);
 	font-size: 1.5rem;
 }
 
-.detalj__pris {
-	margin: 0 0 var(--luft-2);
-	color: var(--aksent);
+.detail__price {
+	margin: 0 0 var(--space-2);
+	color: var(--accent);
 	font-size: 1.25rem;
 	font-weight: 600;
 }
 
-.detalj__fakta {
+.detail__facts {
 	display: grid;
 	grid-template-columns: auto 1fr;
-	gap: 0.25rem var(--luft-2);
-	margin: 0 0 var(--luft-2);
+	gap: 0.25rem var(--space-2);
+	margin: 0 0 var(--space-2);
 	font-size: 0.9rem;
 }
 
-.detalj__fakta dt {
-	color: var(--tekst-dempet);
+.detail__facts dt {
+	color: var(--text-muted);
 }
 
-.detalj__fakta dd {
+.detail__facts dd {
 	margin: 0;
 }
 
-.detalj__beskrivelse {
+.detail__description {
 	margin: 0;
 }
 
-/* ---------- skjema ---------------------------------------------------- */
+/* ---------- form ------------------------------------------------------ */
 
-.skjema {
+.form {
 	display: flex;
 	flex-direction: column;
-	gap: var(--luft-2);
+	gap: var(--space-2);
 }
 
-.skjema__rad {
+.form__row {
 	display: flex;
 	flex-direction: column;
 	gap: 0.35rem;
 	margin: 0;
 }
 
-.skjema__rad label {
-	color: var(--tekst-dempet);
+.form__row label {
+	color: var(--text-muted);
 	font-size: 0.9rem;
 }
 
-/* ---------- tablet ---------------------------------------------------- */
+/* ---------- tablet ----------------------------------------------------- */
 
 @media (min-width: 768px) {
-	.sokelinje {
+	.search-bar {
 		flex-direction: row;
 	}
 
-	.sokelinje .felt:first-of-type {
+	.search-bar .field:first-of-type {
 		flex: 1;
 	}
 
-	.annonseliste {
+	.listing-grid {
 		grid-template-columns: repeat(2, 1fr);
 	}
 
-	.skjema {
+	.form {
 		max-width: 34rem;
 	}
 }
 
-/* ---------- desktop --------------------------------------------------- */
+/* ---------- desktop ---------------------------------------------------- */
 
 @media (min-width: 1024px) {
-	.topplinje {
-		padding: var(--luft-2) var(--luft-3);
+	.topbar {
+		padding: var(--space-2) var(--space-3);
 	}
 
-	.annonseliste {
+	.listing-grid {
 		grid-template-columns: repeat(3, 1fr);
 	}
 }

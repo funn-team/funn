@@ -1,74 +1,76 @@
 /* ======================================================================
    src/js/view.js — VIEW
-   Rendrer HTML fra state og sender brukerhandlinger videre. Endrer aldri
-   state selv, og har ingen timere.
+   Renders HTML from state and forwards user actions. Never changes state
+   itself, and has no timers.
 
-   view.js er bare en ruter: den velger riktig skjerm ut fra
-   viewState.skjerm. Selve HTML-en ligger i src/js/screens/, én fil per
-   skjerm, så flere kan jobbe samtidig uten å tråkke i samme fil.
+   view.js is only a router: it picks the right screen based on
+   viewState.screen. The HTML itself lives in src/js/screens/, one file per
+   screen, so several people can work at once without touching the same
+   file.
 
-   Interaktive elementer merkes med data-action i skjermfilene, og
-   bindActions ruter dem til controlleren etter navn.
+   Interactive elements are marked with data-action in the screen files,
+   and bindActions routes them to the controller by name.
 
-   Eier: Malin (app-skall)
+   Maintainer: see README. Anyone may work here — say so first.
    ====================================================================== */
 
-import { renderDetalj } from "./screens/detaljSkjerm.js"
-import { renderListe } from "./screens/listeSkjerm.js"
-import { renderNyAnnonse } from "./screens/nyAnnonseSkjerm.js"
+import { renderDetailScreen } from "./screens/detailScreen.js"
+import { renderListScreen } from "./screens/listScreen.js"
+import { renderNewListingScreen } from "./screens/newListingScreen.js"
 
-const skjermer = {
-	liste: renderListe,
-	detalj: renderDetalj,
-	ny: renderNyAnnonse,
+const screens = {
+	list: renderListScreen,
+	detail: renderDetailScreen,
+	new: renderNewListingScreen,
 }
 
 export function createView(rootEl) {
-	const utgang = rootEl.querySelector("#main")
-	if (!utgang) throw new Error("Mangler <main id=\"main\"> inne i #app")
+	const output = rootEl.querySelector("#main")
+	if (!output) throw new Error('Missing <main id="main"> inside #app')
 
 	function render(viewState) {
-		const tegn = skjermer[viewState.skjerm] ?? renderListe
-		const fokus = lesFokus()
-		utgang.innerHTML = tegn(viewState)
-		gjenopprettFokus(fokus)
+		const draw = screens[viewState.screen] ?? renderListScreen
+		const focus = readFocus()
+		output.innerHTML = draw(viewState)
+		restoreFocus(focus)
 	}
 
-	/* Hele skjermen tegnes på nytt ved hver endring. Uten dette ville
-	   søkefeltet mistet fokus for hvert tastetrykk. */
-	function lesFokus() {
-		const aktiv = document.activeElement
-		if (!aktiv || !utgang.contains(aktiv) || !aktiv.dataset.action) return null
-		let markør = null
+	/* The whole screen is redrawn on every change. Without this, the search
+	   field would lose focus on every keystroke. */
+	function readFocus() {
+		const active = document.activeElement
+		if (!active || !output.contains(active) || !active.dataset.action) return null
+		let caret = null
 		try {
-			markør = aktiv.selectionStart
+			caret = active.selectionStart
 		} catch {
-			// Noen felttyper støtter ikke selectionStart. Da hopper vi over.
+			// Some input types do not support selectionStart. Skip it.
 		}
-		return { handling: aktiv.dataset.action, markør }
+		return { action: active.dataset.action, caret }
 	}
 
-	function gjenopprettFokus(fokus) {
-		if (!fokus) return
-		const felt = utgang.querySelector(`[data-action="${fokus.handling}"]`)
-		if (!felt) return
-		felt.focus()
-		if (fokus.markør === null) return
+	function restoreFocus(focus) {
+		if (!focus) return
+		const field = output.querySelector(`[data-action="${focus.action}"]`)
+		if (!field) return
+		field.focus()
+		if (focus.caret === null) return
 		try {
-			felt.setSelectionRange(fokus.markør, fokus.markør)
+			field.setSelectionRange(focus.caret, focus.caret)
 		} catch {
-			// Se over.
+			// See above.
 		}
 	}
 
-	/* Tre delegerte lyttere på rota. handlers = { handlingsnavn: (event, element) => {} }
-	   Fordi de ligger på #app og ikke på innholdet, overlever de at
-	   innholdet byttes ut ved hver render. */
+	/* Three delegated listeners on the root.
+	   handlers = { actionName: (event, element) => {} }
+	   Because they sit on #app and not on the content, they survive the
+	   content being replaced on every render. */
 	function bindActions(handlers) {
 		rootEl.addEventListener("click", (event) => {
 			const element = event.target.closest("[data-action]")
 			if (!element) return
-			// Skjemafelt håndteres av input-lytteren under.
+			// Form fields are handled by the input listener below.
 			if (element.matches("input, select, textarea, form")) return
 			if (element.tagName === "A") event.preventDefault()
 			handlers[element.dataset.action]?.(event, element)
@@ -81,10 +83,10 @@ export function createView(rootEl) {
 		})
 
 		rootEl.addEventListener("submit", (event) => {
-			const skjema = event.target.closest("form[data-action]")
-			if (!skjema) return
+			const form = event.target.closest("form[data-action]")
+			if (!form) return
 			event.preventDefault()
-			handlers[skjema.dataset.action]?.(event, skjema)
+			handlers[form.dataset.action]?.(event, form)
 		})
 	}
 

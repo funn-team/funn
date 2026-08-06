@@ -1,13 +1,13 @@
 /* ======================================================================
-   src/js/format.js — SMÅHJELPERE FOR VIEW
-   Brukes av skjermene. Ingen state her, bare rene funksjoner.
+   src/js/format.js — VIEW HELPERS
+   Used by the screens. Pure functions, no state.
    ====================================================================== */
 
-/* Gjør tekst trygg å legge inn i HTML.
-   Uten denne kan en annonsetittel som inneholder <script> kjøre kode.
-   Alt som kommer fra bruker skal gjennom escapeHtml. */
-export function escapeHtml(verdi) {
-	return String(verdi ?? "")
+/* Makes text safe to put into HTML.
+   Without this, a listing title containing <script> would run as code.
+   Everything that came from a user goes through escapeHtml. */
+export function escapeHtml(value) {
+	return String(value ?? "")
 		.replaceAll("&", "&amp;")
 		.replaceAll("<", "&lt;")
 		.replaceAll(">", "&gt;")
@@ -16,6 +16,6 @@ export function escapeHtml(verdi) {
 }
 
 /* 3500 -> "3 500 kr" */
-export function kroner(beløp) {
-	return `${new Intl.NumberFormat("nb-NO").format(beløp)} kr`
+export function formatPrice(amount) {
+	return `${new Intl.NumberFormat("nb-NO").format(amount)} kr`
 }

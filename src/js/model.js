@@ -1,133 +1,135 @@
 /* ======================================================================
    src/js/model.js — MODEL
-   All state og alle data. Ingen DOM, ingen timere.
-   Andre lag snakker med modellen gjennom funksjonene som returneres her,
-   og får beskjed om endringer via subscribe/notify.
+   All state and all data. No DOM, no timers.
 
-   Eier: Person B
+   Other layers talk to the model through the functions returned here, and
+   hear about changes through subscribe/notify.
+
+   Maintainer: see README. Anyone may work here — say so first.
    ====================================================================== */
 
-import { seedAnnonser } from "./seed.js"
+import { seedListings } from "./seed.js"
 
-const LAGRINGSNØKKEL = "funn:annonser"
+const STORAGE_KEY = "funn:listings"
 
 export function createModel() {
-	const lyttere = new Set()
+	const listeners = new Set()
 
 	const state = {
-		annonser: lesFraLagring(),
-		skjerm: "liste", // "liste" | "detalj" | "ny"
-		valgtId: null,
-		søk: "",
-		kategori: "alle",
+		listings: readFromStorage(),
+		screen: "list", // "list" | "detail" | "new"
+		selectedId: null,
+		search: "",
+		category: "all",
 	}
 
-	/* ---------- lagring ---------------------------------------------- */
+	/* ---------- storage ------------------------------------------------ */
 
-	function lesFraLagring() {
+	function readFromStorage() {
 		try {
-			const lagret = localStorage.getItem(LAGRINGSNØKKEL)
-			return lagret ? JSON.parse(lagret) : [...seedAnnonser]
+			const stored = localStorage.getItem(STORAGE_KEY)
+			return stored ? JSON.parse(stored) : [...seedListings]
 		} catch {
-			// Ødelagt eller blokkert localStorage skal ikke krasje appen.
-			return [...seedAnnonser]
+			// Corrupt or blocked localStorage must not crash the app.
+			return [...seedListings]
 		}
 	}
 
-	function skrivTilLagring() {
+	function writeToStorage() {
 		try {
-			localStorage.setItem(LAGRINGSNØKKEL, JSON.stringify(state.annonser))
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(state.listings))
 		} catch {
-			// Full eller avslått lagring: appen fungerer, dataene overlever
-			// bare ikke en refresh. Bedre enn å krasje under demoen.
+			// Storage full or denied: the app keeps working, the data just
+			// does not survive a refresh. Better than crashing mid-demo.
 		}
 	}
 
-	/* ---------- utledet data ------------------------------------------
-	   View skal aldri regne selv. byggViewState samler alt view trenger,
-	   ferdig filtrert, og sendes med hver notify.
-	   ------------------------------------------------------------------ */
+	/* ---------- derived data -------------------------------------------
+	   The view never calculates anything. buildViewState collects
+	   everything the view needs, already filtered, and is sent along with
+	   every notify.
+	   -------------------------------------------------------------------- */
 
-	function filtrer(annonser, søk, kategori) {
-		const tekst = søk.trim().toLowerCase()
-		return annonser.filter((annonse) => {
-			const treffPåTekst = tekst === "" || annonse.tittel.toLowerCase().includes(tekst)
-			const treffPåKategori = kategori === "alle" || annonse.kategori === kategori
-			return treffPåTekst && treffPåKategori
+	function filterListings(listings, search, category) {
+		const text = search.trim().toLowerCase()
+		return listings.filter((listing) => {
+			const matchesText = text === "" || listing.title.toLowerCase().includes(text)
+			const matchesCategory = category === "all" || listing.category === category
+			return matchesText && matchesCategory
 		})
 	}
 
-	function byggViewState() {
+	function buildViewState() {
 		return {
-			skjerm: state.skjerm,
-			søk: state.søk,
-			kategori: state.kategori,
-			synligeAnnonser: filtrer(state.annonser, state.søk, state.kategori),
-			antallTotalt: state.annonser.length,
-			valgtAnnonse: state.annonser.find((a) => a.id === state.valgtId) ?? null,
-			kategorier: ["alle", ...new Set(state.annonser.map((a) => a.kategori))],
+			screen: state.screen,
+			search: state.search,
+			category: state.category,
+			visibleListings: filterListings(state.listings, state.search, state.category),
+			totalCount: state.listings.length,
+			selectedListing: state.listings.find((l) => l.id === state.selectedId) ?? null,
+			categories: ["all", ...new Set(state.listings.map((l) => l.category))],
 		}
 	}
 
-	/* ---------- subscribe / notify ------------------------------------ */
+	/* ---------- subscribe / notify -------------------------------------- */
 
-	function subscribe(lytter) {
-		lyttere.add(lytter)
-		return () => lyttere.delete(lytter)
+	function subscribe(listener) {
+		listeners.add(listener)
+		return () => listeners.delete(listener)
 	}
 
 	function notify() {
-		const viewState = byggViewState()
-		for (const lytter of lyttere) lytter(viewState)
+		const viewState = buildViewState()
+		for (const listener of listeners) listener(viewState)
 	}
 
-	/* ---------- handlinger -------------------------------------------- */
+	/* ---------- actions -------------------------------------------------- */
 
-	function visListe() {
-		state.skjerm = "liste"
-		state.valgtId = null
+	function showList() {
+		state.screen = "list"
+		state.selectedId = null
 		notify()
 	}
 
-	function visDetalj(id) {
-		state.skjerm = "detalj"
-		state.valgtId = id
+	function showDetail(id) {
+		state.screen = "detail"
+		state.selectedId = id
 		notify()
 	}
 
-	function visNy() {
-		state.skjerm = "ny"
+	function showNew() {
+		state.screen = "new"
 		notify()
 	}
 
-	function settSøk(tekst) {
-		state.søk = tekst
+	function setSearch(text) {
+		state.search = text
 		notify()
 	}
 
-	function settKategori(kategori) {
-		state.kategori = kategori
+	function setCategory(category) {
+		state.category = category
 		notify()
 	}
 
-	function leggTilAnnonse(data) {
-		const annonse = {
+	function addListing(input) {
+		const listing = {
 			id: crypto.randomUUID(),
-			tittel: data.tittel,
-			pris: Number(data.pris),
-			kategori: data.kategori,
-			beskrivelse: data.beskrivelse,
-			sted: data.sted,
-			bildeUrl: data.bildeUrl ?? "",
-			opprettet: new Date().toISOString().slice(0, 10),
+			title: input.title,
+			price: Number(input.price),
+			category: input.category,
+			description: input.description,
+			location: input.location,
+			imageUrl: input.imageUrl ?? "",
+			createdAt: new Date().toISOString().slice(0, 10),
 		}
-		state.annonser = [annonse, ...state.annonser]
-		skrivTilLagring()
-		visDetalj(annonse.id)
-		return annonse
+		state.listings = [listing, ...state.listings]
+		writeToStorage()
+		showDetail(listing.id)
+		return listing
 	}
 
-	// Kalles én gang av controlleren for å tegne første skjerm.
+	// Called once by the controller to draw the first screen.
 	function start() {
 		notify()
 	}
@@ -135,11 +137,11 @@ export function createModel() {
 	return {
 		subscribe,
 		start,
-		visListe,
-		visDetalj,
-		visNy,
-		settSøk,
-		settKategori,
-		leggTilAnnonse,
+		showList,
+		showDetail,
+		showNew,
+		setSearch,
+		setCategory,
+		addListing,
 	}
 }

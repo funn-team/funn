@@ -1,38 +1,38 @@
 /* ======================================================================
    src/js/controller.js — CONTROLLER
-   Kobler model og view sammen. All oppførsel og all event-håndtering
-   bor her. Ingen HTML, ingen state.
+   Connects model and view. All behaviour and all event handling lives
+   here. No HTML, no state.
 
-   Nye funksjoner legges til som nye handlers under. Hold hver handler
-   på et par linjer — jobben er å oversette en brukerhandling til ett
-   kall inn i modellen.
+   New features are added as new handlers below. Keep each handler to a
+   couple of lines — its job is to translate one user action into one call
+   into the model.
 
-   Eier: Malin (app-skall) — små, additive endringer fra alle
+   Maintainer: see README. Expect small, additive changes from everyone.
    ====================================================================== */
 
 export function createController({ model, view }) {
 	function init() {
-		// View tegner på nytt hver gang modellen sier fra.
+		// The view redraws every time the model says something changed.
 		model.subscribe(view.render)
 
 		view.bindActions({
-			visListe: () => model.visListe(),
+			showList: () => model.showList(),
 
-			visNy: () => model.visNy(),
+			showNew: () => model.showNew(),
 
-			visDetalj: (_event, element) => model.visDetalj(element.dataset.id),
+			showDetail: (_event, element) => model.showDetail(element.dataset.id),
 
-			søk: (_event, element) => model.settSøk(element.value),
+			search: (_event, element) => model.setSearch(element.value),
 
-			velgKategori: (_event, element) => model.settKategori(element.value),
+			selectCategory: (_event, element) => model.setCategory(element.value),
 
-			lagreAnnonse: (_event, skjema) => {
-				const felter = Object.fromEntries(new FormData(skjema))
-				model.leggTilAnnonse(felter)
+			saveListing: (_event, form) => {
+				const fields = Object.fromEntries(new FormData(form))
+				model.addListing(fields)
 			},
 		})
 
-		// Første tegning.
+		// First draw.
 		model.start()
 	}
 
