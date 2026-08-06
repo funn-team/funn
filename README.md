@@ -40,7 +40,7 @@ The repository belongs to the [funn-team](https://github.com/funn-team) organiza
 - Rune Smedhaugen ([@RuneSmedhaugen](https://github.com/RuneSmedhaugen))
 - Kasper Haugestøl ([@shift-primal](https://github.com/shift-primal))
 - Malin Fossum ([@malinfossum](https://github.com/malinfossum))
-- *(fifth member to be added)*
+- Rolf Olsen ([@Wasteoidz](https://github.com/Wasteoidz))
 
 ## Who maintains what
 
