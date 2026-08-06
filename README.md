@@ -1,6 +1,8 @@
 # funn
 
-A small marketplace app: post an item for sale, browse the listings, and open one for details. Team project at GET Academy.
+A small marketplace app: post an item for sale, browse the listings, and open one for details.
+
+Built by [funn-team](https://github.com/funn-team), five developers-in-training at GET Academy.
 
 ## Stack
 
@@ -32,7 +34,7 @@ Interactive elements are marked with `data-action` in the screen files. `bindAct
 
 ## Team
 
-Built by five people at GET Academy. Everyone has write access and an equal say in the project.
+The repository belongs to the [funn-team](https://github.com/funn-team) organization. Every member is an owner with equal access and an equal say.
 
 - Kristian ([@CozREV](https://github.com/CozREV))
 - Rune Smedhaugen ([@RuneSmedhaugen](https://github.com/RuneSmedhaugen))
@@ -56,7 +58,8 @@ Each area has a first responder. This is about avoiding merge conflicts and know
 ## Conventions
 
 - **All code is English** — function names, variables, data fields, file names, CSS classes, `data-action` names and commit messages. Norwegian appears only inside quotes, as text shown to the user. If it is not in quotes, it is English.
-- Anything a user typed goes through `escapeHtml` before it reaches `innerHTML`.
+- Anything a user typed goes through `escapeHtml` before it reaches `innerHTML`, and image URLs go through `safeImageUrl`.
+- A listing nests its seller under `seller`, but `FormData` is flat — the form uses `sellerName`, `sellerPhone`, `sellerEmail`, `city` and `zip`, and `model.addListing` assembles them. Rename one, rename the other.
 - CSS is mobile-first. Breakpoints: `768px` for tablet, `1024px` for desktop.
 - One branch and one pull request per card on the board.
 

@@ -12,6 +12,10 @@ import { seedListings } from "./seed.js"
 
 const STORAGE_KEY = "funn:listings"
 
+/* Fixed list rather than derived from the data, so the form offers the
+   same options even when no listing uses a given condition yet. */
+const CONDITIONS = ["Ny", "Pent brukt", "Brukt", "Synlig brukt", "Ødelagt/trenger reparasjon"]
+
 export function createModel() {
 	const listeners = new Set()
 
@@ -28,7 +32,16 @@ export function createModel() {
 	function readFromStorage() {
 		try {
 			const stored = localStorage.getItem(STORAGE_KEY)
-			return stored ? JSON.parse(stored) : [...seedListings]
+			if (!stored) return [...seedListings]
+
+			const parsed = JSON.parse(stored)
+			// Data saved under an older shape is discarded rather than
+			// rendered as undefined. Cheap insurance while the model is
+			// still changing.
+			if (!Array.isArray(parsed) || parsed.some((listing) => !listing?.seller)) {
+				return [...seedListings]
+			}
+			return parsed
 		} catch {
 			// Corrupt or blocked localStorage must not crash the app.
 			return [...seedListings]
@@ -68,6 +81,7 @@ export function createModel() {
 			totalCount: state.listings.length,
 			selectedListing: state.listings.find((l) => l.id === state.selectedId) ?? null,
 			categories: ["all", ...new Set(state.listings.map((l) => l.category))],
+			conditions: CONDITIONS,
 		}
 	}
 
@@ -112,6 +126,9 @@ export function createModel() {
 		notify()
 	}
 
+	/* input comes from FormData, which is always flat. The seller fields are
+	   named sellerName, sellerPhone, sellerEmail, city and zip in the form,
+	   and are assembled into the nested seller object here. */
 	function addListing(input) {
 		const listing = {
 			id: crypto.randomUUID(),
@@ -119,9 +136,18 @@ export function createModel() {
 			price: Number(input.price),
 			category: input.category,
 			description: input.description,
-			location: input.location,
+			condition: input.condition,
 			imageUrl: input.imageUrl ?? "",
 			createdAt: new Date().toISOString().slice(0, 10),
+			seller: {
+				name: input.sellerName,
+				phone: input.sellerPhone,
+				email: input.sellerEmail,
+				location: {
+					city: input.city,
+					zip: input.zip,
+				},
+			},
 		}
 		state.listings = [listing, ...state.listings]
 		writeToStorage()

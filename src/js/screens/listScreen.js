@@ -7,7 +7,7 @@
    Maintainer: see README. Search and filter is built as a pair.
    ====================================================================== */
 
-import { escapeHtml, formatPrice } from "../format.js"
+import { escapeHtml, formatPrice, safeImageUrl } from "../format.js"
 
 export function renderListScreen(viewState) {
 	const { visibleListings, categories, search, category, totalCount } = viewState
@@ -55,14 +55,26 @@ function renderListingGrid(listings) {
 }
 
 function renderCard(listing) {
+	const city = listing.seller?.location?.city ?? ""
+
 	return `
 		<li class="card">
 			<button class="card__button" type="button" data-action="showDetail" data-id="${escapeHtml(listing.id)}">
+				${renderThumbnail(listing)}
 				<span class="card__title">${escapeHtml(listing.title)}</span>
 				<span class="card__price">${formatPrice(listing.price)}</span>
-				<span class="card__meta">${escapeHtml(listing.location)} · ${escapeHtml(listing.category)}</span>
+				<span class="card__meta">${escapeHtml(city)} · ${escapeHtml(listing.category)}</span>
 			</button>
 		</li>
+	`
+}
+
+function renderThumbnail(listing) {
+	const url = safeImageUrl(listing.imageUrl)
+	if (!url) return `<span class="thumbnail thumbnail--empty" aria-hidden="true"></span>`
+
+	return `
+		<img class="thumbnail" src="${escapeHtml(url)}" alt="" loading="lazy">
 	`
 }
 

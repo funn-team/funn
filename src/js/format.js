@@ -19,3 +19,17 @@ export function escapeHtml(value) {
 export function formatPrice(amount) {
 	return `${new Intl.NumberFormat("nb-NO").format(amount)} kr`
 }
+
+/* Image URLs come from the form, so they are user input going straight
+   into a src attribute. Only http and https are allowed through —
+   anything else returns an empty string and the screen shows a
+   placeholder instead. */
+export function safeImageUrl(value) {
+	if (!value) return ""
+	try {
+		const url = new URL(value, window.location.href)
+		return url.protocol === "http:" || url.protocol === "https:" ? url.href : ""
+	} catch {
+		return ""
+	}
+}

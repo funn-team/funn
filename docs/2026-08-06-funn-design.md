@@ -72,20 +72,30 @@ One listing. This is the contract all four features share — change it only by 
 
 ```js
 {
-  id: "a1",
+  id: "bd2a38ca-22e9-4c8e-a647-2d6aaf7a837b",
   title: "Brukt terrengsykkel",
   price: 3500,
   category: "Sport og friluft",
   description: "Lite brukt, ny kjede.",
-  location: "Lillehammer",
-  imageUrl: "",              // empty = placeholder, no upload in the MVP
-  createdAt: "2026-08-03"
+  condition: "Pent brukt",
+  imageUrl: "https://…",     // empty = placeholder, no upload in the MVP
+  createdAt: "2026-08-03",
+  seller: {
+    name: "Ola Nordmann",
+    phone: "+47 924 51 067",
+    email: "ola.nordmann@gmail.com",
+    location: { city: "Lillehammer", zip: "2609" }
+  }
 }
 ```
 
-The `name` attributes in the form must match these field names — the controller builds the object straight from `FormData`.
+`condition` comes from a fixed list in `model.js`: Ny, Pent brukt, Brukt, Synlig brukt, Ødelagt/trenger reparasjon. It is a fixed list rather than derived from the data, so the form offers every option even when no listing uses it yet.
 
-**Storage:** `localStorage` under the key `funn:listings`, seeded from `src/js/seed.js` on first load so the demo is never empty. A corrupt or blocked `localStorage` falls back to the seed rather than crashing.
+**The form is flat, the listing is nested.** `FormData` cannot produce nested objects, so the form fields are named `sellerName`, `sellerPhone`, `sellerEmail`, `city` and `zip`, and `model.addListing` assembles them into `seller`. Renaming a field in the form means renaming it in `addListing` too — that pair is the easiest thing in this project to break silently.
+
+**Storage:** `localStorage` under the key `funn:listings`, seeded from `src/js/seed.js` on first load so the demo is never empty. A corrupt or blocked `localStorage` falls back to the seed rather than crashing, and so does data saved under an older shape — anything without a `seller` object is discarded rather than rendered as `undefined`.
+
+**Image URLs** are user input going into a `src` attribute, so they pass through `safeImageUrl`, which allows only `http` and `https`. Anything else falls back to a placeholder.
 
 **Navigation:** the model holds `screen` (`"list"` | `"detail"` | `"new"`) and `selectedId`. No router and no library — the view renders whatever the model says. Ten lines of code.
 
