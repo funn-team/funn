@@ -13,7 +13,7 @@
 export function createController({ model, view }) {
 	function init() {
 		// The view redraws every time the model says something changed.
-		model.subscribe(view.render)
+		model.subscribe(view.render);
 
 		view.bindActions({
 			showList: () => model.showList(),
@@ -27,14 +27,14 @@ export function createController({ model, view }) {
 			selectCategory: (_event, element) => model.setCategory(element.value),
 
 			saveListing: (_event, form) => {
-				const fields = Object.fromEntries(new FormData(form))
-				model.addListing(fields)
+				const fields = Object.fromEntries(new FormData(form));
+				model.addListing(fields);
 			},
-		})
+		});
 
 		// First draw.
-		model.start()
+		model.start();
 	}
 
-	return { init }
+	return { init };
 }
