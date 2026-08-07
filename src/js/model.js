@@ -8,7 +8,7 @@
    Maintainer: see README. Anyone may work here — say so first.
    ====================================================================== */
 
-import { seedListings } from "./seed.js";
+import { CONDITIONS, seedListings } from "./seed.js";
 
 const STORAGE_KEY = "funn:listings";
 
@@ -24,6 +24,9 @@ export function createModel() {
 		selectedId: null,
 		search: "",
 		category: "all",
+		// sort controls which ordering the view should render
+		// options: 'price-asc', 'price-desc', 'date-desc', 'date-asc'
+		sort: 'date-desc',
 	};
 
 	/* ---------- storage ------------------------------------------------ */
@@ -76,16 +79,33 @@ export function createModel() {
 		});
 	}
 
+	function sortListings(listings, sortKey) {
+		// Operate on a shallow copy so original state is never mutated.
+		const copy = [...listings]
+		switch (sortKey) {
+			case 'price-asc':
+				return copy.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0))
+			case 'price-desc':
+				return copy.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0))
+			case 'date-asc':
+				// createdAt is stored as ISO YYYY-MM-DD so lexicographic compare works
+				return copy.sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''))
+			case 'date-desc':
+			default:
+				return copy.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
+		}
+	}
+
 	function buildViewState() {
+		const filtered = filterListings(state.listings, state.search, state.category)
+		const visible = sortListings(filtered, state.sort)
+
 		return {
 			screen: state.screen,
 			search: state.search,
 			category: state.category,
-			visibleListings: filterListings(
-				state.listings,
-				state.search,
-				state.category,
-			),
+			sort: state.sort,
+			visibleListings: visible,
 			totalCount: state.listings.length,
 			selectedListing:
 				state.listings.find((l) => l.id === state.selectedId) ?? null,
@@ -135,6 +155,11 @@ export function createModel() {
 		notify();
 	}
 
+	function setSort(sortKey) {
+		state.sort = sortKey
+		notify()
+	}
+
 	/* input comes from FormData, which is always flat. The seller fields are
 	   named sellerName, sellerPhone, sellerEmail, city and zip in the form,
 	   and are assembled into the nested seller object here. */
@@ -177,6 +202,7 @@ export function createModel() {
 		showNew,
 		setSearch,
 		setCategory,
+		setSort,
 		addListing,
 	};
 }
