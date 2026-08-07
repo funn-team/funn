@@ -16,6 +16,9 @@ export function createController({ model, view }) {
 		model.subscribe(view.render);
 
 		view.bindActions({
+			formInput: (_event, element) =>
+				model.setFormValue(element.name, element.value),
+
 			showList: () => model.showList(),
 
 			showNew: () => model.showNew(),
@@ -34,6 +37,12 @@ export function createController({ model, view }) {
 
 			selectCategory: (_event, element) => model.setCategory(element.value),
 
+			setSort: (_event, element) => model.setSort(element.value),
+
+			toggleFavorite: (_event, element) => model.toggleFavorite(element.dataset.id),
+
+			toggleFavoritesFilter: () => model.toggleFavoritesFilter(),
+
 			saveListing: (_event, form) => {
 				const fields = Object.fromEntries(new FormData(form));
 				if(fields.id) {
@@ -44,7 +53,9 @@ export function createController({ model, view }) {
 				}
 				model.addListing(fields);
 			},
-		});
+
+
+		})
 
 		// First draw.
 		model.start();

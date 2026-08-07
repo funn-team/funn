@@ -8,9 +8,10 @@
    Maintainer: see README. Anyone may work here — say so first.
    ====================================================================== */
 
-import { seedListings } from "./seed.js";
+import { CONDITIONS, seedListings } from "./seed.js";
 
-const STORAGE_KEY = "funn:listings";
+const STORAGE_KEY = "funn:listings"
+const FAVORITES_KEY = "funn:favorites"
 
 /* Fixed list rather than derived from the data, so the form offers the
    same options even when no listing uses a given condition yet. */
@@ -22,11 +23,19 @@ export function createModel() {
 
 	const state = {
 		listings: readFromStorage(),
-		screen: "list", // "list" | "detail" | "new"
+		screen: "new", // "list" | "detail" | "new"
 		selectedId: null,
 		search: "",
 		category: "all",
 		confirmDeleteId: null
+		favoriteIds: readFavoritesFromStorage(),
+		showOnlyFavorites: false,
+		// options: 'price-asc', 'price-desc', 'date-desc', 'date-asc'
+		sort: "date-desc",
+		form: {
+			values: {},
+			errors: {},
+		},
 	};
 
 	/* ---------- storage ------------------------------------------------ */
@@ -42,7 +51,7 @@ export function createModel() {
 			// still changing.
 			if (
 				!Array.isArray(parsed) ||
-				parsed.some((listing) => !listing?.seller)
+				parsed.some((listing) => !listing?.seller || !listing?.location)
 			) {
 				return [...seedListings];
 			}
@@ -62,39 +71,100 @@ export function createModel() {
 		}
 	}
 
+	function readFavoritesFromStorage() {
+		try {
+			const stored = localStorage.getItem(FAVORITES_KEY)
+			if (!stored) return new Set()
+
+			const parsed = JSON.parse(stored)
+
+			if (!Array.isArray(parsed)) {
+				return new Set()
+			}
+			return new Set(parsed)
+		} catch {
+			return new Set()
+		}
+	}
+
+	function writeFavoritesToStorage() {
+		try {
+			localStorage.setItem(
+				FAVORITES_KEY,
+				JSON.stringify(Array.from(state.favoriteIds)),
+			)
+		} catch {
+			// Storage full or denied: the app keeps working, the data just
+			// does not survive a refresh. Better than crashing mid-demo.
+		}
+	}
+
 	/* ---------- derived data -------------------------------------------
 	   The view never calculates anything. buildViewState collects
 	   everything the view needs, already filtered, and is sent along with
 	   every notify.
 	   -------------------------------------------------------------------- */
 
-	function filterListings(listings, search, category) {
-		const text = search.trim().toLowerCase();
+	function filterListings(listings, search, category, showOnlyFavorites, favorites) {
+		const text = search.trim().toLowerCase()
 		return listings.filter((listing) => {
-			const matchesText =
-				text === "" || listing.title.toLowerCase().includes(text);
-			const matchesCategory =
-				category === "all" || listing.category === category;
-			return matchesText && matchesCategory;
-		});
+			const matchesText = text === "" || listing.title.toLowerCase().includes(text)
+			const matchesCategory = category === "all" || listing.category === category
+			const matchesFavorites = !showOnlyFavorites || favorites.has(listing.id)
+			return matchesText && matchesCategory && matchesFavorites
+		})
+	}
+
+	function sortListings(listings, sortKey) {
+		// Operate on a shallow copy so original state is never mutated.
+		const copy = [...listings]
+		switch (sortKey) {
+			case "price-asc":
+				return copy.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0))
+			case "price-desc":
+				return copy.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0))
+			case "date-asc":
+				// createdAt is stored as ISO YYYY-MM-DD so lexicographic compare works
+				return copy.sort((a, b) => (a.createdAt || "").localeCompare(b.createdAt || ""))
+			case "date-desc":
+			default:
+				return copy.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""))
+		}
 	}
 
 	function buildViewState() {
+		const filtered = filterListings(
+			state.listings,
+			state.search,
+			state.category,
+			state.showOnlyFavorites,
+			state.favoriteIds,
+		)
+
 		return {
 			screen: state.screen,
 			search: state.search,
 			category: state.category,
-			visibleListings: filterListings(
-				state.listings,
-				state.search,
-				state.category,
-			),
+			sort: state.sort,
+
+			visibleListings: sortListings(filtered, state.sort),
+
 			totalCount: state.listings.length,
-			selectedListing:
-				state.listings.find((l) => l.id === state.selectedId) ?? null,
+
+			favoriteIds: [...state.favoriteIds],
+			favoriteCount: state.favoriteIds.size,
+			showOnlyFavorites: state.showOnlyFavorites,
+
+			selectedListing: state.listings.find((l) => l.id === state.selectedId) ?? null,
+
 			categories: ["all", ...new Set(state.listings.map((l) => l.category))],
 			conditions: CONDITIONS,
 			confirmDeleteId: state.confirmDeleteId
+
+			form: {
+				values: state.form.values,
+				errors: state.form.errors,
+			},
 		};
 	}
 
@@ -185,10 +255,52 @@ export function createModel() {
 		notify();
 	}
 
+	function setSort(sortKey) {
+		state.sort = sortKey
+		notify()
+	}
+
+	function toggleFavorite(id) {
+		if (state.favoriteIds.has(id)) {
+			state.favoriteIds.delete(id)
+		} else {
+			state.favoriteIds.add(id)
+		}
+		writeFavoritesToStorage()
+		notify()
+	}
+
+	function toggleFavoritesFilter() {
+		state.showOnlyFavorites = !state.showOnlyFavorites
+		notify()
+	}
+
+	function setFormValue(name, value) {
+		state.form.values[name] = value;
+	}
+
+	function clearFormValues() {
+		state.form.values = {};
+		state.form.errors = {};
+	}
+
 	/* input comes from FormData, which is always flat. The seller fields are
-	   named sellerName, sellerPhone, sellerEmail, city and zip in the form,
-	   and are assembled into the nested seller object here. */
+	   named sellerName, sellerPhone and sellerEmail, and the location fields
+	   are named city and zip. They are assembled into seller and location,
+	   two sibling objects on the listing. Renaming a field in the form means
+	   renaming it here too. */
 	function addListing(input) {
+		const location = {
+			city: input.city,
+			zip: input.zip,
+		};
+
+		const seller = {
+			name: input.sellerName,
+			phone: input.sellerPhone,
+			email: input.sellerEmail,
+		};
+
 		const listing = {
 			id: crypto.randomUUID(),
 			title: input.title,
@@ -198,20 +310,64 @@ export function createModel() {
 			condition: input.condition,
 			imageUrl: input.imageUrl ?? "",
 			createdAt: new Date().toISOString().slice(0, 10),
-			seller: {
-				name: input.sellerName,
-				phone: input.sellerPhone,
-				email: input.sellerEmail,
-				location: {
-					city: input.city,
-					zip: input.zip,
-				},
-			},
+			seller,
+			location,
 		};
+
+		const errors = validateListing(listing);
+
+		if (Object.keys(errors).length > 0) {
+			state.form.errors = errors;
+			notify();
+			return;
+		}
+
+		clearFormValues();
+
 		state.listings = [listing, ...state.listings];
 		writeToStorage();
 		showDetail(listing.id);
 		return listing;
+	}
+
+	function validateListing(listing) {
+		const isValidLength = (text, min = 3, max = 80) =>
+			text.length >= min && text.length <= max;
+
+		const isValidPrice = (price, min = 0, max = 999999) =>
+			Number.isFinite(price) && price >= min && price <= max;
+
+		const isValidEmail = (email) =>
+			/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
+
+		const isValidPhone = (phone) => /^\d{8,}$/.test(phone.replace(/\s/g, ""));
+
+		const isValidZip = (zip) => /^\d{4}$/.test(zip);
+
+		const isValidUrl = (url) => URL.canParse(url);
+
+		const errors = {};
+
+		if (!isValidLength(listing.title, 3, 80))
+			errors.title = "Tittel må være 3–80 tegn";
+		if (!isValidLength(listing.description, 10, 500))
+			errors.description = "Beskrivelse må være minst 10 tegn";
+		if (!isValidPrice(Number(listing.price)))
+			errors.price = "Prisen må være et positivt tall";
+		if (!isValidZip(listing.location.zip))
+			errors.zip = "Postnummer må være 4 sifre";
+		if (!isValidLength(listing.location.city))
+			errors.city = "Sted må være minst 2 tegn";
+		if (!isValidLength(listing.seller.name))
+			errors.sellerName = "Navnet ditt må være minst 3 tegn";
+		if (!isValidEmail(listing.seller.email))
+			errors.sellerEmail = "Ugyldig e-postadresse";
+		if (!isValidPhone(listing.seller.phone))
+			errors.sellerPhone = "Telefonnummer må ha minst 8 sifre";
+		if (listing.imageUrl && !isValidUrl(listing.imageUrl))
+			errors.imageUrl = "Ugyldig URL";
+
+		return errors;
 	}
 
 	// Called once by the controller to draw the first screen.
@@ -232,6 +388,10 @@ export function createModel() {
 		updateListing,
 		setSearch,
 		setCategory,
+		setSort,
+		setFormValue,
 		addListing,
-	};
+		toggleFavorite,
+		toggleFavoritesFilter,
+	}
 }
