@@ -7,7 +7,7 @@
    Maintainer: see README. Search and filter is built as a pair.
    ====================================================================== */
 
-import { escapeHtml, formatPrice, safeImageUrl } from "../format.js"
+import { escapeHtml, formatPrice, safeImageUrl } from "../format.js";
 
 export function renderListScreen(viewState) {
 	const {
@@ -72,11 +72,11 @@ function renderListingGrid(listings, favoriteIds) {
 		<ul class="listing-grid">
 			${listings.map((listing) => renderCard(listing, favoriteIds)).join("")}
 		</ul>
-	`
+	`;
 }
 
 function renderCard(listing, favoriteIds) {
-	const city = listing.seller?.location?.city ?? ""
+	const city = listing.location?.city ?? ""
 	const isFavorite = favoriteIds.includes(listing.id)
 
 	return `
@@ -110,14 +110,15 @@ function renderCard(listing, favoriteIds) {
 }
 
 function renderThumbnail(listing) {
-	const url = safeImageUrl(listing.imageUrl)
-	if (!url) return `<span class="thumbnail thumbnail--empty" aria-hidden="true"></span>`
+	const url = safeImageUrl(listing.imageUrl);
+	if (!url)
+		return `<span class="thumbnail thumbnail--empty" aria-hidden="true"></span>`;
 
 	return `
 		<img class="thumbnail" src="${escapeHtml(url)}" alt="" loading="lazy">
-	`
+	`;
 }
 
 function renderEmptyState() {
-	return `<p class="empty">Ingen annonser passer søket.</p>`
+	return `<p class="empty">Ingen annonser passer søket.</p>`;
 }
