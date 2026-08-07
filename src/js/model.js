@@ -116,8 +116,7 @@ export function createModel() {
 				text === "" || listing.title.toLowerCase().includes(text);
 			const matchesCategory =
 				category === "all" || listing.category === category;
-			const matchesFavorites =
-				!showOnlyFavorites || favorites.has(listing.id);
+			const matchesFavorites = !showOnlyFavorites || favorites.has(listing.id);
 			return matchesText && matchesCategory && matchesFavorites;
 		});
 	}
@@ -173,10 +172,7 @@ export function createModel() {
 			selectedListing:
 				state.listings.find((l) => l.id === state.selectedId) ?? null,
 
-			categories: [
-				"all",
-				...new Set(state.listings.map((l) => l.category)),
-			],
+			categories: ["all", ...new Set(state.listings.map((l) => l.category))],
 			conditions: CONDITIONS,
 			confirmDeleteId: state.confirmDeleteId,
 
@@ -365,8 +361,7 @@ export function createModel() {
 		const isValidEmail = (email) =>
 			/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
-		const isValidPhone = (phone) =>
-			/^\d{8,}$/.test(phone.replace(/\s/g, ""));
+		const isValidPhone = (phone) => /^\d{8,}$/.test(phone.replace(/\s/g, ""));
 
 		const isValidZip = (zip) => /^\d{4}$/.test(zip);
 
