@@ -16,6 +16,9 @@ export function createController({ model, view }) {
 		model.subscribe(view.render);
 
 		view.bindActions({
+			formInput: (_event, element) =>
+				model.setFormValue(element.name, element.value),
+
 			showList: () => model.showList(),
 
 			showNew: () => model.showNew(),

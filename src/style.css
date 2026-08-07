@@ -18,6 +18,13 @@
 	--accent: #4c9aff;
 	--accent-text: #0b1220;
 
+	--success: #4cd97a;
+	--success-text: #08210f;
+	--warning: #f5b942;
+	--warning-text: #241a00;
+	--error: #ff5c5c;
+	--error-text: #2a0a0a;
+
 	--radius: 10px;
 	--space-1: 0.5rem;
 	--space-2: 1rem;
@@ -167,6 +174,10 @@ body {
 	list-style: none;
 }
 
+.card {
+	position: relative;
+}
+
 .card__button {
 	display: grid;
 	gap: 0.25rem;
@@ -179,6 +190,33 @@ body {
 	font: inherit;
 	text-align: left;
 	cursor: pointer;
+}
+
+.card__favorite {
+	position: absolute;
+	top: var(--space-1);
+	right: var(--space-1);
+	z-index: 1;
+	display: grid;
+	place-items: center;
+	width: 2rem;
+	height: 2rem;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: 50%;
+	color: var(--text-muted);
+	font-size: 1.1rem;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.card__favorite:hover {
+	background: var(--surface-hover);
+}
+
+.card__favorite[aria-pressed="true"] {
+	color: var(--warning);
+	border-color: var(--warning);
 }
 
 .thumbnail {
@@ -216,6 +254,7 @@ body {
 /* ---------- detail view ----------------------------------------------- */
 
 .detail {
+	position: relative;
 	padding: var(--space-3);
 	background: var(--surface);
 	border: 1px solid var(--border);
@@ -339,6 +378,43 @@ body {
 .form__hint {
 	font-weight: 400;
 	opacity: 0.7;
+}
+
+.form__error {
+	display: block;
+	color: var(--error);
+	font-size: 0.85rem;
+	font-weight: 600;
+}
+
+.form__error::before {
+	content: "! ";
+}
+
+.field[aria-invalid="true"] {
+	border-color: var(--error);
+}
+
+.form__summary {
+	padding: var(--space-2);
+	background: var(--surface);
+	border: 1px solid var(--error);
+	border-radius: var(--radius);
+}
+
+.form__summary p {
+	margin: 0 0 var(--space-1);
+	color: var(--error);
+	font-weight: 600;
+}
+
+.form__summary ul {
+	margin: 0;
+	padding-left: 1.2rem;
+}
+
+.form__summary a {
+	color: var(--error);
 }
 
 /* ---------- tablet ----------------------------------------------------- */

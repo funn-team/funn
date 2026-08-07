@@ -67,15 +67,17 @@ const listingExample = {
 	// Must be one of CONDITIONS
 	condition: "Pent brukt",
 
-	/** @type {{name: string, phone: string, email: string, location: {city: string, zip: string}}} **/
+	/** @type {{name: string, phone: string, email: string}} **/
 	seller: {
 		name: "Ola Nordmann",
 		phone: "+47 400 00 001",
 		email: "ola.nordmann@example.com",
-		location: {
-			city: "Lillehammer",
-			zip: "2609",
-		},
+	},
+
+	/** @type {{city: string, zip: string}} **/
+	location: {
+		city: "Lillehammer",
+		zip: "2609",
 	},
 };
 
@@ -95,10 +97,10 @@ export const seedListings = [
 			name: "Ola Nordmann",
 			phone: "+47 400 00 001",
 			email: "ola.nordmann@example.com",
-			location: {
-				city: "Lillehammer",
-				zip: "2609",
-			},
+		},
+		location: {
+			city: "Lillehammer",
+			zip: "2609",
 		},
 	},
 	{
@@ -115,10 +117,10 @@ export const seedListings = [
 			name: "Kari Haugen",
 			phone: "+47 400 00 002",
 			email: "kari.haugen@example.com",
-			location: {
-				city: "Gjøvik",
-				zip: "2815",
-			},
+		},
+		location: {
+			city: "Gjøvik",
+			zip: "2815",
 		},
 	},
 	{
@@ -135,10 +137,10 @@ export const seedListings = [
 			name: "Per Solberg",
 			phone: "+47 400 00 003",
 			email: "per.solberg@example.com",
-			location: {
-				city: "Hamar",
-				zip: "2317",
-			},
+		},
+		location: {
+			city: "Hamar",
+			zip: "2317",
 		},
 	},
 	{
@@ -155,10 +157,10 @@ export const seedListings = [
 			name: "Mona Iversen",
 			phone: "+47 400 00 004",
 			email: "mona.iversen@example.com",
-			location: {
-				city: "Lillehammer",
-				zip: "2609",
-			},
+		},
+		location: {
+			city: "Lillehammer",
+			zip: "2609",
 		},
 	},
 	{
@@ -175,10 +177,10 @@ export const seedListings = [
 			name: "Erik Fjeld",
 			phone: "+47 400 00 005",
 			email: "erik.fjeld@example.com",
-			location: {
-				city: "Ringsaker",
-				zip: "2380",
-			},
+		},
+		location: {
+			city: "Ringsaker",
+			zip: "2380",
 		},
 	},
 	{
@@ -195,10 +197,10 @@ export const seedListings = [
 			name: "Silje Berg",
 			phone: "+47 400 00 006",
 			email: "silje.berg@example.com",
-			location: {
-				city: "Gjøvik",
-				zip: "2815",
-			},
+		},
+		location: {
+			city: "Gjøvik",
+			zip: "2815",
 		},
 	},
 	{
@@ -215,10 +217,10 @@ export const seedListings = [
 			name: "Jonas Lien",
 			phone: "+47 400 00 007",
 			email: "jonas.lien@example.com",
-			location: {
-				city: "Elverum",
-				zip: "2406",
-			},
+		},
+		location: {
+			city: "Elverum",
+			zip: "2406",
 		},
 	},
 	{
@@ -235,10 +237,10 @@ export const seedListings = [
 			name: "Ingrid Moen",
 			phone: "+47 400 00 008",
 			email: "ingrid.moen@example.com",
-			location: {
-				city: "Brumunddal",
-				zip: "2380",
-			},
+		},
+		location: {
+			city: "Brumunddal",
+			zip: "2380",
 		},
 	},
 	{
@@ -255,10 +257,10 @@ export const seedListings = [
 			name: "Hanne Dahl",
 			phone: "+47 400 00 009",
 			email: "hanne.dahl@example.com",
-			location: {
-				city: "Hamar",
-				zip: "2317",
-			},
+		},
+		location: {
+			city: "Hamar",
+			zip: "2317",
 		},
 	},
 	{
@@ -275,10 +277,10 @@ export const seedListings = [
 			name: "Trond Aasen",
 			phone: "+47 400 00 010",
 			email: "trond.aasen@example.com",
-			location: {
-				city: "Moelv",
-				zip: "2390",
-			},
+		},
+		location: {
+			city: "Moelv",
+			zip: "2390",
 		},
 	},
 	{
@@ -295,10 +297,10 @@ export const seedListings = [
 			name: "Camilla Rud",
 			phone: "+47 400 00 011",
 			email: "camilla.rud@example.com",
-			location: {
-				city: "Lillehammer",
-				zip: "2609",
-			},
+		},
+		location: {
+			city: "Lillehammer",
+			zip: "2609",
 		},
 	},
 	{
@@ -315,10 +317,10 @@ export const seedListings = [
 			name: "Marius Strand",
 			phone: "+47 400 00 012",
 			email: "marius.strand@example.com",
-			location: {
-				city: "Otta",
-				zip: "2670",
-			},
+		},
+		location: {
+			city: "Otta",
+			zip: "2670",
 		},
 	},
 ];

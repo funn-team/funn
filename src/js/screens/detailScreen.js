@@ -72,7 +72,7 @@ function renderImage(listing) {
 }
 
 function renderLocation(listing) {
-	const { zip = "", city = "" } = listing.seller?.location ?? {};
+	const { zip = "", city = "" } = listing.location ?? {};
 	return escapeHtml([zip, city].filter(Boolean).join(" "));
 }
 
