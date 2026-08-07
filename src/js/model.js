@@ -92,7 +92,7 @@ export function createModel() {
 				state.listings.find((l) => l.id === state.selectedId) ?? null,
 			categories: ["all", ...new Set(state.listings.map((l) => l.category))],
 			conditions: CONDITIONS,
-			confirmDeleteId: null
+			confirmDeleteId: state.confirmDeleteId
 		};
 	}
 
@@ -223,6 +223,11 @@ export function createModel() {
 		showList,
 		showDetail,
 		showNew,
+		showEdit,
+		requestDelete,
+		cancelDelete,
+		confirmDelete,
+		updateListing,
 		setSearch,
 		setCategory,
 		addListing,

@@ -22,6 +22,7 @@ const screens = {
 	list: renderListScreen,
 	detail: renderDetailScreen,
 	new: renderNewListingScreen,
+	edit: renderNewListingScreen
 };
 
 export function createView(rootEl) {
