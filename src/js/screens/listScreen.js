@@ -19,6 +19,7 @@ export function renderListScreen(viewState) {
 		favoriteIds,
 		favoriteCount,
 		showOnlyFavorites,
+		sort,
 	} = viewState
 
 	return `
@@ -43,6 +44,14 @@ export function renderListScreen(viewState) {
 					</option>`,
 					)
 					.join("")}
+			</select>
+
+			<label class="visually-hidden" for="sort-field">Sortering</label>
+			<select id="sort-field" class="field field--compact" data-action="setSort">
+				<option value="date-desc" ${sort === "date-desc" ? "selected" : ""}>Dato: nyeste først</option>
+				<option value="date-asc" ${sort === "date-asc" ? "selected" : ""}>Dato: eldste først</option>
+				<option value="price-asc" ${sort === "price-asc" ? "selected" : ""}>Pris: lav → høy</option>
+				<option value="price-desc" ${sort === "price-desc" ? "selected" : ""}>Pris: høy → lav</option>
 			</select>
 
 			<label>

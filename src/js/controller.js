@@ -29,6 +29,8 @@ export function createController({ model, view }) {
 
 			selectCategory: (_event, element) => model.setCategory(element.value),
 
+			setSort: (_event, element) => model.setSort(element.value),
+
 			toggleFavorite: (_event, element) => model.toggleFavorite(element.dataset.id),
 
 			toggleFavoritesFilter: () => model.toggleFavoritesFilter(),

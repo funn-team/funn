@@ -27,6 +27,8 @@ export function createModel() {
 		category: "all",
 		favoriteIds: readFavoritesFromStorage(),
 		showOnlyFavorites: false,
+		// options: 'price-asc', 'price-desc', 'date-desc', 'date-asc'
+		sort: "date-desc",
 		form: {
 			values: {},
 			errors: {},
@@ -110,19 +112,39 @@ export function createModel() {
 		})
 	}
 
+	function sortListings(listings, sortKey) {
+		// Operate on a shallow copy so original state is never mutated.
+		const copy = [...listings]
+		switch (sortKey) {
+			case "price-asc":
+				return copy.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0))
+			case "price-desc":
+				return copy.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0))
+			case "date-asc":
+				// createdAt is stored as ISO YYYY-MM-DD so lexicographic compare works
+				return copy.sort((a, b) => (a.createdAt || "").localeCompare(b.createdAt || ""))
+			case "date-desc":
+			default:
+				return copy.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""))
+		}
+	}
+
 	function buildViewState() {
+		const filtered = filterListings(
+			state.listings,
+			state.search,
+			state.category,
+			state.showOnlyFavorites,
+			state.favoriteIds,
+		)
+
 		return {
 			screen: state.screen,
 			search: state.search,
 			category: state.category,
+			sort: state.sort,
 
-			visibleListings: filterListings(
-				state.listings,
-				state.search,
-				state.category,
-				state.showOnlyFavorites,
-				state.favoriteIds,
-			),
+			visibleListings: sortListings(filtered, state.sort),
 
 			totalCount: state.listings.length,
 
