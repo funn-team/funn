@@ -12,12 +12,12 @@ export function escapeHtml(value) {
 		.replaceAll("<", "&lt;")
 		.replaceAll(">", "&gt;")
 		.replaceAll('"', "&quot;")
-		.replaceAll("'", "&#39;")
+		.replaceAll("'", "&#39;");
 }
 
 /* 3500 -> "3 500 kr" */
 export function formatPrice(amount) {
-	return `${new Intl.NumberFormat("nb-NO").format(amount)} kr`
+	return `${new Intl.NumberFormat("nb-NO").format(amount)} kr`;
 }
 
 /* Image URLs come from the form, so they are user input going straight
@@ -25,11 +25,13 @@ export function formatPrice(amount) {
    anything else returns an empty string and the screen shows a
    placeholder instead. */
 export function safeImageUrl(value) {
-	if (!value) return ""
+	if (!value) return "";
 	try {
-		const url = new URL(value, window.location.href)
-		return url.protocol === "http:" || url.protocol === "https:" ? url.href : ""
+		const url = new URL(value, window.location.href);
+		return url.protocol === "http:" || url.protocol === "https:"
+			? url.href
+			: "";
 	} catch {
-		return ""
+		return "";
 	}
 }

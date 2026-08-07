@@ -14,49 +14,50 @@
    Maintainer: see README. Anyone may work here — say so first.
    ====================================================================== */
 
-import { renderDetailScreen } from "./screens/detailScreen.js"
-import { renderListScreen } from "./screens/listScreen.js"
-import { renderNewListingScreen } from "./screens/newListingScreen.js"
+import { renderDetailScreen } from "./screens/detailScreen.js";
+import { renderListScreen } from "./screens/listScreen.js";
+import { renderNewListingScreen } from "./screens/newListingScreen.js";
 
 const screens = {
 	list: renderListScreen,
 	detail: renderDetailScreen,
 	new: renderNewListingScreen,
-}
+};
 
 export function createView(rootEl) {
-	const output = rootEl.querySelector("#main")
-	if (!output) throw new Error('Missing <main id="main"> inside #app')
+	const output = rootEl.querySelector("#main");
+	if (!output) throw new Error('Missing <main id="main"> inside #app');
 
 	function render(viewState) {
-		const draw = screens[viewState.screen] ?? renderListScreen
-		const focus = readFocus()
-		output.innerHTML = draw(viewState)
-		restoreFocus(focus)
+		const draw = screens[viewState.screen] ?? renderListScreen;
+		const focus = readFocus();
+		output.innerHTML = draw(viewState);
+		restoreFocus(focus);
 	}
 
 	/* The whole screen is redrawn on every change. Without this, the search
 	   field would lose focus on every keystroke. */
 	function readFocus() {
-		const active = document.activeElement
-		if (!active || !output.contains(active) || !active.dataset.action) return null
-		let caret = null
+		const active = document.activeElement;
+		if (!active || !output.contains(active) || !active.dataset.action)
+			return null;
+		let caret = null;
 		try {
-			caret = active.selectionStart
+			caret = active.selectionStart;
 		} catch {
 			// Some input types do not support selectionStart. Skip it.
 		}
-		return { action: active.dataset.action, caret }
+		return { action: active.dataset.action, caret };
 	}
 
 	function restoreFocus(focus) {
-		if (!focus) return
-		const field = output.querySelector(`[data-action="${focus.action}"]`)
-		if (!field) return
-		field.focus()
-		if (focus.caret === null) return
+		if (!focus) return;
+		const field = output.querySelector(`[data-action="${focus.action}"]`);
+		if (!field) return;
+		field.focus();
+		if (focus.caret === null) return;
 		try {
-			field.setSelectionRange(focus.caret, focus.caret)
+			field.setSelectionRange(focus.caret, focus.caret);
 		} catch {
 			// See above.
 		}
@@ -68,27 +69,27 @@ export function createView(rootEl) {
 	   content being replaced on every render. */
 	function bindActions(handlers) {
 		rootEl.addEventListener("click", (event) => {
-			const element = event.target.closest("[data-action]")
-			if (!element) return
+			const element = event.target.closest("[data-action]");
+			if (!element) return;
 			// Form fields are handled by the input listener below.
-			if (element.matches("input, select, textarea, form")) return
-			if (element.tagName === "A") event.preventDefault()
-			handlers[element.dataset.action]?.(event, element)
-		})
+			if (element.matches("input, select, textarea, form")) return;
+			if (element.tagName === "A") event.preventDefault();
+			handlers[element.dataset.action]?.(event, element);
+		});
 
 		rootEl.addEventListener("input", (event) => {
-			const element = event.target.closest("[data-action]")
-			if (!element || !element.matches("input, select, textarea")) return
-			handlers[element.dataset.action]?.(event, element)
-		})
+			const element = event.target.closest("[data-action]");
+			if (!element || !element.matches("input, select, textarea")) return;
+			handlers[element.dataset.action]?.(event, element);
+		});
 
 		rootEl.addEventListener("submit", (event) => {
-			const form = event.target.closest("form[data-action]")
-			if (!form) return
-			event.preventDefault()
-			handlers[form.dataset.action]?.(event, form)
-		})
+			const form = event.target.closest("form[data-action]");
+			if (!form) return;
+			event.preventDefault();
+			handlers[form.dataset.action]?.(event, form);
+		});
 	}
 
-	return { render, bindActions }
+	return { render, bindActions };
 }

@@ -149,6 +149,14 @@ body {
 	gap: var(--space-1);
 }
 
+.search-bar .field {
+	min-width: 0;
+}
+
+.search-bar .field--compact {
+	width: 100%;
+}
+
 /* ---------- listing grid --------------------------------------------- */
 
 .listing-grid {
@@ -338,10 +346,21 @@ body {
 @media (min-width: 768px) {
 	.search-bar {
 		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: center;
+	}
+
+	.search-bar .field {
+		width: auto;
 	}
 
 	.search-bar .field:first-of-type {
 		flex: 1;
+		min-width: 0;
+	}
+
+	.search-bar .field--compact {
+		max-width: 14rem;
 	}
 
 	.listing-grid {
