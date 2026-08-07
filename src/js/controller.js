@@ -25,6 +25,14 @@ export function createController({ model, view }) {
 
 			showDetail: (_event, element) => model.showDetail(element.dataset.id),
 
+			showEdit: (_event, element) => model.showEdit(element.dataset.id),
+
+			deleteListing: (_event, element) => model.requestDelete(element.dataset.id),
+
+			confirmDelete: () => model.confirmDelete(),
+
+			cancelDelete: () => model.cancelDelete(),
+
 			search: (_event, element) => model.setSearch(element.value),
 
 			selectCategory: (_event, element) => model.setCategory(element.value),
@@ -37,6 +45,12 @@ export function createController({ model, view }) {
 
 			saveListing: (_event, form) => {
 				const fields = Object.fromEntries(new FormData(form));
+				if(fields.id) {
+					model.updateListing(fields.id, fields)
+				}
+				else {
+					model.addListing(fields)
+				}
 				model.addListing(fields);
 			},
 
