@@ -24,6 +24,7 @@ export function createModel() {
 		selectedId: null,
 		search: "",
 		category: "all",
+		confirmDeleteId: null
 	};
 
 	/* ---------- storage ------------------------------------------------ */
@@ -91,6 +92,7 @@ export function createModel() {
 				state.listings.find((l) => l.id === state.selectedId) ?? null,
 			categories: ["all", ...new Set(state.listings.map((l) => l.category))],
 			conditions: CONDITIONS,
+			confirmDeleteId: null
 		};
 	}
 
@@ -123,6 +125,52 @@ export function createModel() {
 	function showNew() {
 		state.screen = "new";
 		notify();
+	}
+
+	function showEdit(id){
+		state.screen = "edit"
+		state.selectedId = id
+		notify()
+	}
+
+	function requestDelete(id) {
+		state.confirmDeleteId = id
+		notify()
+	}
+	
+	function cancelDelete() {
+		state.confirmDeleteId = null
+		notify()
+	}
+
+	function confirmDelete() {
+		state.listings = state.listings.filter(listing => listing.id !== state.confirmDeleteId)
+		writeToStorage()
+		showList()
+	}
+
+	function updateListing(id, input){
+		state.listings = state.listings.map(listing => listing.id === id ? {
+			id: listing.id,
+			title: input.title,
+			price: Number(input.price),
+			category: input.category,
+			description: input.description,
+			condition: input.condition,
+			imageUrl: input.imageUrl ?? "",
+			createdAt: listing.createdAt,
+			seller: {
+				name: input.sellerName,
+				phone: input.sellerPhone,
+				email: input.sellerEmail,
+				location: {
+					city: input.city,
+					zip: input.zip,
+				},
+			},
+		} : listing)
+		writeToStorage()
+		showDetail(id)
 	}
 
 	function setSearch(text) {
