@@ -15,6 +15,8 @@ const STORAGE_KEY = "funn:listings";
 /* Fixed list rather than derived from the data, so the form offers the
    same options even when no listing uses a given condition yet. */
 
+	const CONDITIONS = ["Ny", "Pent brukt", "Brukt", "Synlig brukt", "Ødelagt/trenger reparasjon"]
+
 export function createModel() {
 	const listeners = new Set();
 

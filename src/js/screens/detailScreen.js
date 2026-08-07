@@ -27,6 +27,7 @@ export function renderDetailScreen(viewState) {
 
 			<article class="detail">
 				${renderImage(listing)}
+				${renderDeleteConfirm(listing, viewState.confirmDeleteId)}
 
 				<h1 class="detail__title">${escapeHtml(listing.title)}</h1>
 				<p class="detail__price">${formatPrice(listing.price)}</p>
@@ -45,6 +46,9 @@ export function renderDetailScreen(viewState) {
 				<p class="detail__description">${escapeHtml(listing.description)}</p>
 
 				${renderSeller(listing)}
+
+				<button class="button button--quiet" type="button" data-action="showEdit" data-id="${listing.id}">Rediger</button>
+				<button class="button button--quiet" type="button" data-action="deleteListing" data-id="${listing.id}">Slett</button>
 			</article>
 		</section>
 	`
@@ -75,5 +79,17 @@ function renderSeller(listing) {
 				<li><a href="mailto:${escapeHtml(seller.email)}">${escapeHtml(seller.email)}</a></li>
 			</ul>
 		</section>
+	`
+}
+
+function renderDeleteConfirm(listing, confirmDeleteId){
+	if (confirmDeleteId !== listing.id) return ""
+
+	return `
+		<div class="popupConfirm">
+			<p>Sikker på at du vil slette annonsen? Dette kan ikke angres.</p>
+			<button class="button" type="button" data-action="confirmDelete">Ja, slett</button>
+			<button class="button button--quiet" type="button" data-action="cancelDelete">Avbryt</button>
+		</div>
 	`
 }
