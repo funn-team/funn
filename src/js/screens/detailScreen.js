@@ -5,10 +5,11 @@
    Maintainer: see README. Anyone may work here — say so first.
    ====================================================================== */
 
-import { escapeHtml, formatPrice, safeImageUrl } from "../format.js"
+import { escapeHtml, formatPrice, safeImageUrl } from "../format.js";
 
 export function renderDetailScreen(viewState) {
-	const listing = viewState.selectedListing
+	const listing = viewState.selectedListing;
+	const favoriteIds = viewState.favoriteIds;
 
 	if (!listing) {
 		return `
@@ -16,8 +17,10 @@ export function renderDetailScreen(viewState) {
 				<p class="empty">Fant ikke annonsen.</p>
 				<button class="button" type="button" data-action="showList">Til alle annonser</button>
 			</section>
-		`
+		`;
 	}
+
+	const isFavorite = favoriteIds.includes(listing.id);
 
 	return `
 		<section class="screen">
@@ -25,11 +28,22 @@ export function renderDetailScreen(viewState) {
 				&larr; Alle annonser
 			</button>
 
-			<article class="detail">
-				${renderImage(listing)}
+				<article class="detail">
+					${renderImage(listing)}
 
-				<h1 class="detail__title">${escapeHtml(listing.title)}</h1>
-				<p class="detail__price">${formatPrice(listing.price)}</p>
+				<button
+					class="card__favorite"
+					type="button"
+					data-action="toggleFavorite"
+					data-id="${escapeHtml(listing.id)}"
+					aria-pressed="${isFavorite}"
+					aria-label="Favoritt: ${escapeHtml(listing.title)}">
+					${isFavorite ? "★" : "☆"}
+				</button>
+
+					<h1 class="detail__title">${escapeHtml(listing.title)}</h1>
+					<p class="detail__price">${formatPrice(listing.price)}</p>
+
 
 				<dl class="detail__facts">
 					<dt>Kategori</dt>
@@ -47,24 +61,24 @@ export function renderDetailScreen(viewState) {
 				${renderSeller(listing)}
 			</article>
 		</section>
-	`
+	`;
 }
 
 function renderImage(listing) {
-	const url = safeImageUrl(listing.imageUrl)
-	if (!url) return ""
+	const url = safeImageUrl(listing.imageUrl);
+	if (!url) return "";
 
-	return `<img class="detail__image" src="${escapeHtml(url)}" alt="${escapeHtml(listing.title)}">`
+	return `<img class="detail__image" src="${escapeHtml(url)}" alt="${escapeHtml(listing.title)}">`;
 }
 
 function renderLocation(listing) {
-	const { zip = "", city = "" } = listing.seller?.location ?? {}
-	return escapeHtml([zip, city].filter(Boolean).join(" "))
+	const { zip = "", city = "" } = listing.seller?.location ?? {};
+	return escapeHtml([zip, city].filter(Boolean).join(" "));
 }
 
 function renderSeller(listing) {
-	const seller = listing.seller
-	if (!seller) return ""
+	const seller = listing.seller;
+	if (!seller) return "";
 
 	return `
 		<section class="seller">
@@ -75,5 +89,5 @@ function renderSeller(listing) {
 				<li><a href="mailto:${escapeHtml(seller.email)}">${escapeHtml(seller.email)}</a></li>
 			</ul>
 		</section>
-	`
+	`;
 }

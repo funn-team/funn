@@ -10,7 +10,8 @@
 
 import { CONDITIONS, seedListings } from "./seed.js";
 
-const STORAGE_KEY = "funn:listings";
+const STORAGE_KEY = "funn:listings"
+const FAVORITES_KEY = "funn:favorites"
 
 /* Fixed list rather than derived from the data, so the form offers the
    same options even when no listing uses a given condition yet. */
@@ -24,10 +25,9 @@ export function createModel() {
 		selectedId: null,
 		search: "",
 		category: "all",
-		// sort controls which ordering the view should render
-		// options: 'price-asc', 'price-desc', 'date-desc', 'date-asc'
-		sort: 'date-desc',
-	};
+		favoriteIds: readFavoritesFromStorage(),
+		showOnlyFavorites: false,
+	}
 
 	/* ---------- storage ------------------------------------------------ */
 
@@ -62,57 +62,76 @@ export function createModel() {
 		}
 	}
 
+	function readFavoritesFromStorage() {
+		try {
+			const stored = localStorage.getItem(FAVORITES_KEY)
+			if (!stored) return new Set()
+
+			const parsed = JSON.parse(stored)
+			
+			if (!Array.isArray(parsed)) {
+				return new Set()
+			}
+			return new Set(parsed)
+		} catch {
+			return new Set()
+		}
+	}
+
+	function writeFavoritesToStorage() {
+		try {
+			localStorage.setItem(
+				FAVORITES_KEY,
+				JSON.stringify(Array.from(state.favorites)),
+			)
+		} catch {
+			// Storage full or denied: the app keeps working, the data just
+			// does not survive a refresh. Better than crashing mid-demo.
+		}
+	}
+
 	/* ---------- derived data -------------------------------------------
 	   The view never calculates anything. buildViewState collects
 	   everything the view needs, already filtered, and is sent along with
 	   every notify.
 	   -------------------------------------------------------------------- */
 
-	function filterListings(listings, search, category) {
-		const text = search.trim().toLowerCase();
+	function filterListings(listings, search, category, showOnlyFavorites, favorites) {
+		const text = search.trim().toLowerCase()
 		return listings.filter((listing) => {
-			const matchesText =
-				text === "" || listing.title.toLowerCase().includes(text);
-			const matchesCategory =
-				category === "all" || listing.category === category;
-			return matchesText && matchesCategory;
-		});
-	}
-
-	function sortListings(listings, sortKey) {
-		// Operate on a shallow copy so original state is never mutated.
-		const copy = [...listings]
-		switch (sortKey) {
-			case 'price-asc':
-				return copy.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0))
-			case 'price-desc':
-				return copy.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0))
-			case 'date-asc':
-				// createdAt is stored as ISO YYYY-MM-DD so lexicographic compare works
-				return copy.sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''))
-			case 'date-desc':
-			default:
-				return copy.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
-		}
+			const matchesText = text === "" || listing.title.toLowerCase().includes(text)
+			const matchesCategory = category === "all" || listing.category === category
+			const matchesFavorites = !showOnlyFavorites || favorites.has(listing.id)
+			return matchesText && matchesCategory && matchesFavorites
+		})
 	}
 
 	function buildViewState() {
-		const filtered = filterListings(state.listings, state.search, state.category)
-		const visible = sortListings(filtered, state.sort)
+	return {
+		screen: state.screen,
+		search: state.search,
+		category: state.category,
 
-		return {
-			screen: state.screen,
-			search: state.search,
-			category: state.category,
-			sort: state.sort,
-			visibleListings: visible,
-			totalCount: state.listings.length,
-			selectedListing:
-				state.listings.find((l) => l.id === state.selectedId) ?? null,
-			categories: ["all", ...new Set(state.listings.map((l) => l.category))],
-			conditions: CONDITIONS,
-		};
+		visibleListings: filterListings(
+			state.listings,
+			state.search,
+			state.category,
+			state.showOnlyFavorites,
+			state.favoriteIds
+		),
+
+		totalCount: state.listings.length,
+
+		favoriteIds: [...state.favoriteIds],
+		favoriteCount: state.favoriteIds.size,
+		showOnlyFavorites: state.showOnlyFavorites,
+
+		selectedListing: state.listings.find((l) => l.id === state.selectedId) ?? null,
+
+		categories: ["all", ...new Set(state.listings.map((l) => l.category))],
+		conditions: CONDITIONS,
 	}
+}
 
 	/* ---------- subscribe / notify -------------------------------------- */
 
@@ -160,6 +179,21 @@ export function createModel() {
 		notify()
 	}
 
+	function toggleFavorite(id) {
+		if (state.favoriteIds.has(id)) {
+			state.favoriteIds.delete(id)
+		} else {
+			state.favoriteIds.add(id)
+		}
+		writeFavoritesToStorage()
+		notify()
+	}
+
+	function toggleFavoritesFilter() {
+		state.showOnlyFavorites = !state.showOnlyFavorites
+		notify()
+	}
+
 	/* input comes from FormData, which is always flat. The seller fields are
 	   named sellerName, sellerPhone, sellerEmail, city and zip in the form,
 	   and are assembled into the nested seller object here. */
@@ -204,5 +238,7 @@ export function createModel() {
 		setCategory,
 		setSort,
 		addListing,
-	};
+		toggleFavorite,
+		toggleFavoritesFilter,
+	}
 }

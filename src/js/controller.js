@@ -26,13 +26,17 @@ export function createController({ model, view }) {
 
 			selectCategory: (_event, element) => model.setCategory(element.value),
 
-			setSort: (_event, element) => model.setSort(element.value),
+			toggleFavorite: (_event, element) => model.toggleFavorite(element.dataset.id),
+
+			toggleFavoritesFilter: () => model.toggleFavoritesFilter(),
 
 			saveListing: (_event, form) => {
 				const fields = Object.fromEntries(new FormData(form));
 				model.addListing(fields);
 			},
-		});
+
+
+		})
 
 		// First draw.
 		model.start();
