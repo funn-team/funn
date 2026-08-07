@@ -86,7 +86,7 @@ export function createModel() {
 		try {
 			localStorage.setItem(
 				FAVORITES_KEY,
-				JSON.stringify(Array.from(state.favorites)),
+				JSON.stringify(Array.from(state.favoriteIds)),
 			)
 		} catch {
 			// Storage full or denied: the app keeps working, the data just
