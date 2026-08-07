@@ -24,6 +24,8 @@ export function renderListScreen(viewState) {
 
 	return `
 	<section class="screen">
+		<h1 class="page-title">Alle annonser</h1>
+
 		<div class="search-bar" role="search">
 			<label class="visually-hidden" for="search-field">Søk i annonser</label>
 			<input
