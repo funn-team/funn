@@ -31,8 +31,6 @@ export function renderDetailScreen(viewState) {
 			<article class="detail">
 				${renderImage(listing)}
 				${renderDeleteConfirm(listing, viewState.confirmDeleteId)}
-				<article class="detail">
-					${renderImage(listing)}
 
 				<button
 					class="card__favorite"
