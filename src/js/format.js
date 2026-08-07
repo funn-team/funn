@@ -17,6 +17,7 @@ export function escapeHtml(value) {
 
 /* 3500 -> "3 500 kr" */
 export function formatPrice(amount) {
+	if (amount === 0) return "Gis bort";
 	return `${new Intl.NumberFormat("nb-NO").format(amount)} kr`;
 }
 
