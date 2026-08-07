@@ -45,16 +45,12 @@ export function createController({ model, view }) {
 
 			saveListing: (_event, form) => {
 				const fields = Object.fromEntries(new FormData(form));
-				if(fields.id) {
-					model.updateListing(fields.id, fields)
+				if (fields.id) {
+					model.updateListing(fields.id, fields);
+				} else {
+					model.addListing(fields);
 				}
-				else {
-					model.addListing(fields)
-				}
-				model.addListing(fields);
 			},
-
-
 		})
 
 		// First draw.

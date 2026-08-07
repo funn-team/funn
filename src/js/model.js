@@ -16,8 +16,6 @@ const FAVORITES_KEY = "funn:favorites"
 /* Fixed list rather than derived from the data, so the form offers the
    same options even when no listing uses a given condition yet. */
 
-	const CONDITIONS = ["Ny", "Pent brukt", "Brukt", "Synlig brukt", "Ødelagt/trenger reparasjon"]
-
 export function createModel() {
 	const listeners = new Set();
 
@@ -27,7 +25,7 @@ export function createModel() {
 		selectedId: null,
 		search: "",
 		category: "all",
-		confirmDeleteId: null
+		confirmDeleteId: null,
 		favoriteIds: readFavoritesFromStorage(),
 		showOnlyFavorites: false,
 		// options: 'price-asc', 'price-desc', 'date-desc', 'date-asc'
@@ -159,7 +157,7 @@ export function createModel() {
 
 			categories: ["all", ...new Set(state.listings.map((l) => l.category))],
 			conditions: CONDITIONS,
-			confirmDeleteId: state.confirmDeleteId
+			confirmDeleteId: state.confirmDeleteId,
 
 			form: {
 				values: state.form.values,
@@ -235,10 +233,10 @@ export function createModel() {
 				name: input.sellerName,
 				phone: input.sellerPhone,
 				email: input.sellerEmail,
-				location: {
-					city: input.city,
-					zip: input.zip,
-				},
+			},
+			location: {
+				city: input.city,
+				zip: input.zip,
 			},
 		} : listing)
 		writeToStorage()
