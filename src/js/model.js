@@ -10,8 +10,8 @@
 
 import { CONDITIONS, seedListings } from "./seed.js";
 
-const STORAGE_KEY = "funn:listings"
-const FAVORITES_KEY = "funn:favorites"
+const STORAGE_KEY = "funn:listings";
+const FAVORITES_KEY = "funn:favorites";
 
 /* Fixed list rather than derived from the data, so the form offers the
    same options even when no listing uses a given condition yet. */
@@ -21,7 +21,7 @@ export function createModel() {
 
 	const state = {
 		listings: readFromStorage(),
-		screen: "new", // "list" | "detail" | "new"
+		screen: "list", // "list" | "detail" | "new"
 		selectedId: null,
 		search: "",
 		category: "all",
@@ -71,17 +71,17 @@ export function createModel() {
 
 	function readFavoritesFromStorage() {
 		try {
-			const stored = localStorage.getItem(FAVORITES_KEY)
-			if (!stored) return new Set()
+			const stored = localStorage.getItem(FAVORITES_KEY);
+			if (!stored) return new Set();
 
-			const parsed = JSON.parse(stored)
+			const parsed = JSON.parse(stored);
 
 			if (!Array.isArray(parsed)) {
-				return new Set()
+				return new Set();
 			}
-			return new Set(parsed)
+			return new Set(parsed);
 		} catch {
-			return new Set()
+			return new Set();
 		}
 	}
 
@@ -90,7 +90,7 @@ export function createModel() {
 			localStorage.setItem(
 				FAVORITES_KEY,
 				JSON.stringify(Array.from(state.favoriteIds)),
-			)
+			);
 		} catch {
 			// Storage full or denied: the app keeps working, the data just
 			// does not survive a refresh. Better than crashing mid-demo.
@@ -103,30 +103,47 @@ export function createModel() {
 	   every notify.
 	   -------------------------------------------------------------------- */
 
-	function filterListings(listings, search, category, showOnlyFavorites, favorites) {
-		const text = search.trim().toLowerCase()
+	function filterListings(
+		listings,
+		search,
+		category,
+		showOnlyFavorites,
+		favorites,
+	) {
+		const text = search.trim().toLowerCase();
 		return listings.filter((listing) => {
-			const matchesText = text === "" || listing.title.toLowerCase().includes(text)
-			const matchesCategory = category === "all" || listing.category === category
-			const matchesFavorites = !showOnlyFavorites || favorites.has(listing.id)
-			return matchesText && matchesCategory && matchesFavorites
-		})
+			const matchesText =
+				text === "" || listing.title.toLowerCase().includes(text);
+			const matchesCategory =
+				category === "all" || listing.category === category;
+			const matchesFavorites =
+				!showOnlyFavorites || favorites.has(listing.id);
+			return matchesText && matchesCategory && matchesFavorites;
+		});
 	}
 
 	function sortListings(listings, sortKey) {
 		// Operate on a shallow copy so original state is never mutated.
-		const copy = [...listings]
+		const copy = [...listings];
 		switch (sortKey) {
 			case "price-asc":
-				return copy.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0))
+				return copy.sort(
+					(a, b) => (Number(a.price) || 0) - (Number(b.price) || 0),
+				);
 			case "price-desc":
-				return copy.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0))
+				return copy.sort(
+					(a, b) => (Number(b.price) || 0) - (Number(a.price) || 0),
+				);
 			case "date-asc":
 				// createdAt is stored as ISO YYYY-MM-DD so lexicographic compare works
-				return copy.sort((a, b) => (a.createdAt || "").localeCompare(b.createdAt || ""))
+				return copy.sort((a, b) =>
+					(a.createdAt || "").localeCompare(b.createdAt || ""),
+				);
 			case "date-desc":
 			default:
-				return copy.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""))
+				return copy.sort((a, b) =>
+					(b.createdAt || "").localeCompare(a.createdAt || ""),
+				);
 		}
 	}
 
@@ -137,7 +154,7 @@ export function createModel() {
 			state.category,
 			state.showOnlyFavorites,
 			state.favoriteIds,
-		)
+		);
 
 		return {
 			screen: state.screen,
@@ -153,9 +170,13 @@ export function createModel() {
 			favoriteCount: state.favoriteIds.size,
 			showOnlyFavorites: state.showOnlyFavorites,
 
-			selectedListing: state.listings.find((l) => l.id === state.selectedId) ?? null,
+			selectedListing:
+				state.listings.find((l) => l.id === state.selectedId) ?? null,
 
-			categories: ["all", ...new Set(state.listings.map((l) => l.category))],
+			categories: [
+				"all",
+				...new Set(state.listings.map((l) => l.category)),
+			],
 			conditions: CONDITIONS,
 			confirmDeleteId: state.confirmDeleteId,
 
@@ -197,50 +218,56 @@ export function createModel() {
 		notify();
 	}
 
-	function showEdit(id){
-		state.screen = "edit"
-		state.selectedId = id
-		notify()
+	function showEdit(id) {
+		state.screen = "edit";
+		state.selectedId = id;
+		notify();
 	}
 
 	function requestDelete(id) {
-		state.confirmDeleteId = id
-		notify()
+		state.confirmDeleteId = id;
+		notify();
 	}
-	
+
 	function cancelDelete() {
-		state.confirmDeleteId = null
-		notify()
+		state.confirmDeleteId = null;
+		notify();
 	}
 
 	function confirmDelete() {
-		state.listings = state.listings.filter(listing => listing.id !== state.confirmDeleteId)
-		writeToStorage()
-		showList()
+		state.listings = state.listings.filter(
+			(listing) => listing.id !== state.confirmDeleteId,
+		);
+		writeToStorage();
+		showList();
 	}
 
-	function updateListing(id, input){
-		state.listings = state.listings.map(listing => listing.id === id ? {
-			id: listing.id,
-			title: input.title,
-			price: Number(input.price),
-			category: input.category,
-			description: input.description,
-			condition: input.condition,
-			imageUrl: input.imageUrl ?? "",
-			createdAt: listing.createdAt,
-			seller: {
-				name: input.sellerName,
-				phone: input.sellerPhone,
-				email: input.sellerEmail,
-			},
-			location: {
-				city: input.city,
-				zip: input.zip,
-			},
-		} : listing)
-		writeToStorage()
-		showDetail(id)
+	function updateListing(id, input) {
+		state.listings = state.listings.map((listing) =>
+			listing.id === id
+				? {
+						id: listing.id,
+						title: input.title,
+						price: Number(input.price),
+						category: input.category,
+						description: input.description,
+						condition: input.condition,
+						imageUrl: input.imageUrl ?? "",
+						createdAt: listing.createdAt,
+						seller: {
+							name: input.sellerName,
+							phone: input.sellerPhone,
+							email: input.sellerEmail,
+						},
+						location: {
+							city: input.city,
+							zip: input.zip,
+						},
+					}
+				: listing,
+		);
+		writeToStorage();
+		showDetail(id);
 	}
 
 	function setSearch(text) {
@@ -254,23 +281,23 @@ export function createModel() {
 	}
 
 	function setSort(sortKey) {
-		state.sort = sortKey
-		notify()
+		state.sort = sortKey;
+		notify();
 	}
 
 	function toggleFavorite(id) {
 		if (state.favoriteIds.has(id)) {
-			state.favoriteIds.delete(id)
+			state.favoriteIds.delete(id);
 		} else {
-			state.favoriteIds.add(id)
+			state.favoriteIds.add(id);
 		}
-		writeFavoritesToStorage()
-		notify()
+		writeFavoritesToStorage();
+		notify();
 	}
 
 	function toggleFavoritesFilter() {
-		state.showOnlyFavorites = !state.showOnlyFavorites
-		notify()
+		state.showOnlyFavorites = !state.showOnlyFavorites;
+		notify();
 	}
 
 	function setFormValue(name, value) {
@@ -338,7 +365,8 @@ export function createModel() {
 		const isValidEmail = (email) =>
 			/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
-		const isValidPhone = (phone) => /^\d{8,}$/.test(phone.replace(/\s/g, ""));
+		const isValidPhone = (phone) =>
+			/^\d{8,}$/.test(phone.replace(/\s/g, ""));
 
 		const isValidZip = (zip) => /^\d{4}$/.test(zip);
 
@@ -391,5 +419,5 @@ export function createModel() {
 		addListing,
 		toggleFavorite,
 		toggleFavoritesFilter,
-	}
+	};
 }
