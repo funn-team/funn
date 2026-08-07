@@ -5,6 +5,12 @@
 
    Norwegian text here is content shown to the user, not identifiers.
 
+   The repo is public, so no seller detail may look like it belongs to a
+   real person. Phone numbers run +47 400 00 00X and are obviously
+   sequential; emails use example.com, which RFC 2606 reserves for
+   documentation and can never be registered. Keep both patterns when
+   adding listings.
+
    Maintainer: see README. Anyone may add more listings.
    ====================================================================== */
 
@@ -64,8 +70,8 @@ const listingExample = {
 	/** @type {{name: string, phone: string, email: string, location: {city: string, zip: string}}} **/
 	seller: {
 		name: "Ola Nordmann",
-		phone: "+47 924 51 067",
-		email: "ola.nordmann@gmail.com",
+		phone: "+47 400 00 001",
+		email: "ola.nordmann@example.com",
 		location: {
 			city: "Lillehammer",
 			zip: "2609",
@@ -87,8 +93,8 @@ export const seedListings = [
 		condition: "Pent brukt",
 		seller: {
 			name: "Ola Nordmann",
-			phone: "+47 924 51 067",
-			email: "ola.nordmann@gmail.com",
+			phone: "+47 400 00 001",
+			email: "ola.nordmann@example.com",
 			location: {
 				city: "Lillehammer",
 				zip: "2609",
@@ -107,8 +113,8 @@ export const seedListings = [
 		condition: "Synlig brukt",
 		seller: {
 			name: "Kari Haugen",
-			phone: "+47 456 12 345",
-			email: "kari.haugen@outlook.com",
+			phone: "+47 400 00 002",
+			email: "kari.haugen@example.com",
 			location: {
 				city: "Gjøvik",
 				zip: "2815",
@@ -127,8 +133,8 @@ export const seedListings = [
 		condition: "Brukt",
 		seller: {
 			name: "Per Solberg",
-			phone: "+47 908 77 234",
-			email: "per.solberg@hotmail.com",
+			phone: "+47 400 00 003",
+			email: "per.solberg@example.com",
 			location: {
 				city: "Hamar",
 				zip: "2317",
@@ -147,8 +153,8 @@ export const seedListings = [
 		condition: "Ny / ubrukt",
 		seller: {
 			name: "Mona Iversen",
-			phone: "+47 991 23 456",
-			email: "mona.iversen@gmail.com",
+			phone: "+47 400 00 004",
+			email: "mona.iversen@example.com",
 			location: {
 				city: "Lillehammer",
 				zip: "2609",
@@ -167,8 +173,8 @@ export const seedListings = [
 		condition: "Brukt",
 		seller: {
 			name: "Erik Fjeld",
-			phone: "+47 402 88 123",
-			email: "erik.fjeld@yahoo.com",
+			phone: "+47 400 00 005",
+			email: "erik.fjeld@example.com",
 			location: {
 				city: "Ringsaker",
 				zip: "2380",
@@ -187,8 +193,8 @@ export const seedListings = [
 		condition: "Ødelagt / trenger reparasjon",
 		seller: {
 			name: "Silje Berg",
-			phone: "+47 967 45 210",
-			email: "silje.berg@gmail.com",
+			phone: "+47 400 00 006",
+			email: "silje.berg@example.com",
 			location: {
 				city: "Gjøvik",
 				zip: "2815",
