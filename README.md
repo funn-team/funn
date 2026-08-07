@@ -4,6 +4,17 @@ A small marketplace app: post an item for sale, browse the listings, and open on
 
 Built by [funn-team](https://github.com/funn-team), five developers-in-training at GET Academy.
 
+## Features
+
+- Browse all listings, with search by title and filter by category
+- Sort by price or date, ascending or descending
+- Open a listing for full details and seller contact information
+- Post a new listing, with validation on every field
+- Edit or delete a listing
+- Mark listings as favourites and filter down to them — favourites survive a refresh
+
+Everything is kept in `localStorage`. There is no sign-in, no messaging, no bidding and no payment; those were deliberately left out to keep the scope landable.
+
 ## Stack
 
 Vanilla JavaScript with an MVC structure. No build step, no dependencies. Listings are stored in `localStorage`, seeded from `src/js/seed.js` on first load.
@@ -28,9 +39,14 @@ Pick whichever you have:
 | View | `src/js/screens/*.js` | One file per screen. Each returns HTML as a string. |
 | Controller | `src/js/controller.js` | Behaviour and event handling. Translates one user action into one call into the model. |
 
-The view never calculates anything. The model hands it a finished `viewState` containing the filtered listings, the selected listing and the category list.
+The view never calculates anything. The model hands it a finished `viewState` containing the listings already filtered and sorted, the selected listing, the category and condition lists, the favourite ids and any form errors.
 
 Interactive elements are marked with `data-action` in the screen files. `bindActions` in `view.js` routes them to the controller by name.
+
+The whole screen is redrawn on every change, which has two consequences worth knowing before you touch `view.js`:
+
+- Focus would be lost on every keystroke, so `render` saves and restores the focused field and its caret position. On a screen change it moves focus to that screen's `<h1>` instead.
+- A live region inside `#main` would be destroyed at the same moment its text changed, and never announce. `#status` therefore lives outside `#main` in `index.html`, and `view.js` writes into it.
 
 ## Team
 
@@ -42,24 +58,29 @@ The repository belongs to the [funn-team](https://github.com/funn-team) organiza
 - Malin Fossum ([@malinfossum](https://github.com/malinfossum))
 - Rolf Olsen ([@Wasteoidz](https://github.com/Wasteoidz))
 
-## Who maintains what
+## Who built what
 
-Each area has a first responder. This is about avoiding merge conflicts and knowing who to ask — not about permission. Anyone may work anywhere; just tell the maintainer first.
+The work was split into vertical slices rather than by layer, so everyone wrote model, view and controller code for their own feature.
 
-| Area | Files | Maintainer |
+| Feature | Owner | Mainly touches |
 |---|---|---|
-| Model and storage | `model.js`, `seed.js` | *assigned at kickoff* |
-| List screen | `screens/listScreen.js` | *assigned at kickoff* |
-| Detail screen | `screens/detailScreen.js` | *assigned at kickoff* |
-| New listing form | `screens/newListingScreen.js` | *assigned at kickoff* |
-| Search and filter | `model.js` + `screens/listScreen.js` | *pair, assigned at kickoff* |
-| App shell, styling, docs | `index.html`, `view.js`, `controller.js`, `style.css` | *assigned at kickoff* |
+| Sorting by price and date | Rolf Olsen | `model.js`, `screens/listScreen.js`, `controller.js` |
+| Favourites | Rune Smedhaugen | `model.js`, `screens/listScreen.js`, `screens/detailScreen.js` |
+| Edit and delete a listing | Kristian | `model.js`, `screens/newListingScreen.js`, `screens/detailScreen.js` |
+| Form validation | Kasper Haugestøl | `model.js`, `screens/newListingScreen.js` |
+| App shell, accessibility, docs | Malin Fossum | `index.html`, `view.js`, `style.css`, `seed.js`, `README.md` |
+
+Search and category filter were built as part of the walking skeleton before the slices were handed out.
+
+`model.js` and `controller.js` are shared by every slice. Merge to `main` the same day you finish a layer, and pull `main` before starting the next one — that is what keeps the conflicts small.
 
 ## Conventions
 
 - **All code is English** — function names, variables, data fields, file names, CSS classes, `data-action` names and commit messages. Norwegian appears only inside quotes, as text shown to the user. If it is not in quotes, it is English.
 - Anything a user typed goes through `escapeHtml` before it reaches `innerHTML`, and image URLs go through `safeImageUrl`.
-- A listing nests its seller under `seller`, but `FormData` is flat — the form uses `sellerName`, `sellerPhone`, `sellerEmail`, `city` and `zip`, and `model.addListing` assembles them. Rename one, rename the other.
+- A listing nests contact details under `seller` and the place under `location`, but `FormData` is flat — the form uses `sellerName`, `sellerPhone`, `sellerEmail`, `city` and `zip`, and `model.addListing` assembles both objects. Rename a field in one place and you must rename it in the other; nothing will warn you.
+- Seed sellers must never look like real people. Phone numbers run `+47 400 00 00X` and emails use `example.com`, which RFC 2606 reserves for documentation. The repository is public.
+- Accessibility is part of done, not a pass at the end: every screen has one `<h1>`, every field has a label, every icon button has an `aria-label`, and `#status` in `index.html` announces result counts.
 - CSS is mobile-first. Breakpoints: `768px` for tablet, `1024px` for desktop.
 - One branch and one pull request per card on the board.
 
