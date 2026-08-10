@@ -27,7 +27,8 @@ export function createController({ model, view }) {
 
 			showEdit: (_event, element) => model.showEdit(element.dataset.id),
 
-			deleteListing: (_event, element) => model.requestDelete(element.dataset.id),
+			deleteListing: (_event, element) =>
+				model.requestDelete(element.dataset.id),
 
 			confirmDelete: () => model.confirmDelete(),
 
@@ -39,7 +40,8 @@ export function createController({ model, view }) {
 
 			setSort: (_event, element) => model.setSort(element.value),
 
-			toggleFavorite: (_event, element) => model.toggleFavorite(element.dataset.id),
+			toggleFavorite: (_event, element) =>
+				model.toggleFavorite(element.dataset.id),
 
 			toggleFavoritesFilter: () => model.toggleFavoritesFilter(),
 
@@ -51,7 +53,7 @@ export function createController({ model, view }) {
 					model.addListing(fields);
 				}
 			},
-		})
+		});
 
 		// First draw.
 		model.start();

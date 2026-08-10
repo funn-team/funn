@@ -96,8 +96,8 @@ function renderSeller(listing) {
 	`;
 }
 
-function renderDeleteConfirm(listing, confirmDeleteId){
-	if (confirmDeleteId !== listing.id) return ""
+function renderDeleteConfirm(listing, confirmDeleteId) {
+	if (confirmDeleteId !== listing.id) return "";
 
 	return `
 		<div class="popupConfirm">
@@ -105,5 +105,5 @@ function renderDeleteConfirm(listing, confirmDeleteId){
 			<button class="button" type="button" data-action="confirmDelete">Ja, slett</button>
 			<button class="button button--quiet" type="button" data-action="cancelDelete">Avbryt</button>
 		</div>
-	`
+	`;
 }
