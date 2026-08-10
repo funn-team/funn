@@ -7,6 +7,10 @@
 		<link href="./style.css" rel="stylesheet">
 	</head>
 	<body>
+		<!-- First focusable element on the page, so a keyboard user can jump
+		     past the topbar. Only visible while it has focus. -->
+		<a class="skip-link" href="#main">Hopp til innhold</a>
+
 		<!-- #app is the root of the view layer. All clicks are caught here
 		     (see view.js). Screens are rendered into #main. -->
 		<div id="app">
@@ -17,7 +21,14 @@
 				</button>
 			</header>
 
-			<main id="main"></main>
+			<!-- tabindex="-1" makes #main a valid target for the skip link. -->
+			<main id="main" tabindex="-1"></main>
+
+			<!-- Screens are re-rendered wholesale, and a live region that is
+			     replaced at the same moment its text changes does not get
+			     announced. This one lives outside #main so it survives every
+			     render — view.js writes into it. -->
+			<p id="status" class="visually-hidden" role="status" aria-live="polite"></p>
 		</div>
 
 		<script type="module" src="./js/app.js"></script>
