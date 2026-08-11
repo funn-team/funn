@@ -135,7 +135,7 @@ export const seedListings = [
 		category: "Møbler og interiør",
 		description: "Elektrisk. Fungerer som det skal, hentes selv.",
 		imageUrl:
-			"https://images.pexels.com/photos/36181031/pexels-photo-36181031.jpeg",
+			"https://images.pexels.com/photos/8001034/pexels-photo-8001034.jpeg",
 		createdAt: "2026-08-04",
 		condition: "Brukt",
 		sold: false,
@@ -219,7 +219,7 @@ export const seedListings = [
 		category: "Fritid, hobby og underholdning",
 		description: "Selges samlet med liten øvingsforsterker og kabel.",
 		imageUrl:
-			"https://images.pexels.com/photos/31246540/pexels-photo-31246540.jpeg",
+			"https://images.pexels.com/photos/375893/pexels-photo-375893.jpeg",
 		createdAt: "2026-07-28",
 		condition: "Pent brukt",
 		sold: false,
@@ -240,7 +240,7 @@ export const seedListings = [
 		category: "Dyr og utstyr",
 		description: "Halvannen meter høyt. Vasket, litt slitt på toppen.",
 		imageUrl:
-			"https://images.pexels.com/photos/32557420/pexels-photo-32557420.jpeg",
+			"https://images.pexels.com/photos/2083940/pexels-photo-2083940.jpeg",
 		createdAt: "2026-07-30",
 		condition: "Brukt",
 		sold: false,
@@ -282,7 +282,7 @@ export const seedListings = [
 		category: "Møbler og interiør",
 		description: "Fem hyller, 180 cm høy. Må hentes, tas ikke fra hverandre.",
 		imageUrl:
-			"https://images.pexels.com/photos/38481083/pexels-photo-38481083.jpeg",
+			"https://images.pexels.com/photos/2883049/pexels-photo-2883049.jpeg",
 		createdAt: "2026-08-02",
 		condition: "Brukt",
 		sold: false,
