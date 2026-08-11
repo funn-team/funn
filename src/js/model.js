@@ -11,7 +11,12 @@
    ====================================================================== */
 
 import { CONDITIONS } from "#/data/seed.data";
-import { fetchListings } from "./api";
+import {
+	fetchCreateListing,
+	fetchGetListings,
+	fetchUpdateListing,
+	fetchDeleteListing,
+} from "./api";
 
 const FAVORITES_KEY = "funn:favorites";
 
@@ -216,39 +221,53 @@ export function createModel() {
 		notify();
 	}
 
-	function confirmDelete() {
+	async function confirmDelete() {
+		try {
+			await fetchDeleteListing(state.confirmDeleteId);
+		} catch {
+			state.actionError = true;
+			notify();
+			return;
+		}
+
 		state.listings = state.listings.filter(
 			(listing) => listing.id !== state.confirmDeleteId,
 		);
-		writeToStorage();
+
 		showList();
 	}
 
-	function updateListing(id, input) {
+	async function updateListing(id, input) {
+		const updated = {
+			title: input.title,
+			price: Number(input.price),
+			category: input.category,
+			description: input.description,
+			condition: input.condition,
+			imageUrl: input.imageUrl ?? "",
+			seller: {
+				name: input.sellerName,
+				phone: input.sellerPhone,
+				email: input.sellerEmail,
+			},
+			location: {
+				city: input.city,
+				zip: input.zip,
+			},
+		};
+
+		try {
+			await fetchUpdateListing(id, input);
+		} catch {
+			state.actionError = true;
+			notify();
+			return;
+		}
+
 		state.listings = state.listings.map((listing) =>
-			listing.id === id
-				? {
-						id: listing.id,
-						title: input.title,
-						price: Number(input.price),
-						category: input.category,
-						description: input.description,
-						condition: input.condition,
-						imageUrl: input.imageUrl ?? "",
-						createdAt: listing.createdAt,
-						seller: {
-							name: input.sellerName,
-							phone: input.sellerPhone,
-							email: input.sellerEmail,
-						},
-						location: {
-							city: input.city,
-							zip: input.zip,
-						},
-					}
-				: listing,
+			listing.id === id ? { ...listing, ...updated } : listing,
 		);
-		writeToStorage();
+
 		showDetail(id);
 	}
 
@@ -296,18 +315,8 @@ export function createModel() {
 	   are named city and zip. They are assembled into seller and location,
 	   two sibling objects on the listing. Renaming a field in the form means
 	   renaming it here too. */
-	function addListing(input) {
-		const location = {
-			city: input.city,
-			zip: input.zip,
-		};
 
-		const seller = {
-			name: input.sellerName,
-			phone: input.sellerPhone,
-			email: input.sellerEmail,
-		};
-
+	async function addListing(input) {
 		const listing = {
 			id: crypto.randomUUID(),
 			title: input.title,
@@ -317,24 +326,35 @@ export function createModel() {
 			condition: input.condition,
 			imageUrl: input.imageUrl ?? "",
 			createdAt: new Date().toISOString().slice(0, 10),
-			seller,
-			location,
+			seller: {
+				name: input.sellerName,
+				phone: input.sellerPhone,
+				email: input.sellerEmail,
+			},
+			location: {
+				city: input.city,
+				zip: input.zip,
+			},
 		};
 
 		const errors = validateListing(listing);
-
 		if (Object.keys(errors).length > 0) {
 			state.form.errors = errors;
 			notify();
 			return;
 		}
 
-		clearFormValues();
+		try {
+			fetchCreateListing(listing);
+		} catch {
+			state.actionError = true;
+			notify();
+			return;
+		}
 
+		clearFormValues();
 		state.listings = [listing, ...state.listings];
-		writeToStorage();
 		showDetail(listing.id);
-		return listing;
 	}
 
 	function validateListing(listing) {
@@ -383,7 +403,7 @@ export function createModel() {
 		notify();
 
 		try {
-			state.listings = await fetchListings();
+			state.listings = await fetchGetListings();
 		} catch {
 			state.loadError = true;
 		} finally {
