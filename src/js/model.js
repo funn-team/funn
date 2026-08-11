@@ -309,6 +309,14 @@ export function createModel() {
 		state.form.errors = {};
 	}
 
+	function toggleSold(id){
+		state.listings = state.listings.map(listing =>
+			listing.id === id ? {...listing, sold: !listing.sold} : listing
+		)
+		writeToStorage()
+		notify()
+	}
+
 	/* input comes from FormData, which is always flat. The seller fields are
 	   named sellerName, sellerPhone and sellerEmail, and the location fields
 	   are named city and zip. They are assembled into seller and location,
@@ -395,14 +403,6 @@ export function createModel() {
 			errors.imageUrl = "Ugyldig URL";
 
 		return errors;
-	}
-
-	function toggleSold(id){
-		state.listings = state.listings.map(listing =>
-			listing.id === id ? {...listing, sold: !listing.sold} : listing
-		)
-		writeToStorage()
-		notify()
 	}
 
 	// Called once by the controller to draw the first screen.
