@@ -87,11 +87,9 @@ function renderListingGrid(listings, favoriteIds) {
 }
 
 function renderCard(listing, favoriteIds) {
-	const city = listing.location?.city ?? ""
-	const isFavorite = favoriteIds.includes(listing.id)
-	const isSold = listing.sold
 	const city = listing.location?.city ?? "";
 	const isFavorite = favoriteIds.includes(listing.id);
+	const isSold = listing.sold
 
 	return `
 	<li class="card">
