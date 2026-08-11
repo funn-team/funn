@@ -95,8 +95,8 @@ export function createController({ model, view }) {
 		const fields = Object.fromEntries(new FormData(form));
 
 		if (fields.id) {
-			model.updateListing(fields.id, fields);
-			syncUrl(listingHash("annonse", fields.id));
+			const updated = model.updateListing(fields.id, fields);
+			if (updated) syncUrl(listingHash("annonse", fields.id));
 			return;
 		}
 

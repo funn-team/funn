@@ -239,33 +239,39 @@ export function createModel() {
 	}
 
 	function updateListing(id, input) {
-		if (!input.title) return
-		
-		state.listings = state.listings.map((listing) =>
-			listing.id === id
-				? {
-						id: listing.id,
-						title: input.title,
-						price: Number(input.price),
-						category: input.category,
-						description: input.description,
-						condition: input.condition,
-						imageUrl: input.imageUrl ?? "",
-						createdAt: listing.createdAt,
-						seller: {
-							name: input.sellerName,
-							phone: input.sellerPhone,
-							email: input.sellerEmail,
-						},
-						location: {
-							city: input.city,
-							zip: input.zip,
-						},
-					}
-				: listing,
-		);
-		writeToStorage();
-		showDetail(id);
+	const listing = state.listings.find((item) => item.id === id);
+	if (!listing) return;
+
+	const updated = {
+		...listing,
+		title: input.title,
+		price: Number(input.price),
+		category: input.category,
+		description: input.description,
+		condition: input.condition,
+		imageUrl: input.imageUrl ?? "",
+		seller: {
+			name: input.sellerName,
+			phone: input.sellerPhone,
+			email: input.sellerEmail,
+		},
+		location: { city: input.city, zip: input.zip },
+	};
+
+	const errors = validateListing(updated);
+	if (Object.keys(errors).length > 0) {
+		state.form.errors = errors;
+		notify();
+		return;
+	}
+
+	state.form.errors = {};
+	state.listings = state.listings.map((item) =>
+		item.id === id ? updated : item,
+	);
+	writeToStorage();
+	showDetail(id);
+	return updated;
 	}
 
 	function setSearch(text) {
