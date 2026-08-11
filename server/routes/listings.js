@@ -12,7 +12,7 @@ const rowToListing = (row) => ({
 	category: row.category,
 	condition: row.condition,
 	imageUrl: row.image_url,
-	createdAt: row.created_at.toIsoString().slice(0, 10),
+	createdAt: row.created_at.toISOString().slice(0, 10),
 	seller: {
 		name: row.seller_name,
 		phone: row.seller_phone,
@@ -24,7 +24,7 @@ const rowToListing = (row) => ({
 	},
 });
 
-listingsRouter.get("/", async (res) => {
+listingsRouter.get("/", async (_, res) => {
 	const { rows } = await pool.query(
 		"SELECT * FROM listings ORDER BY created_at DESC",
 	);
@@ -80,7 +80,7 @@ listingsRouter.post("/", async (req, res) => {
 	res.status(201).json(rowToListing(rows[0]));
 });
 
-listingsRouter.patch("/:id", async (req) => {
+listingsRouter.patch("/:id", async (req, res) => {
 	const {
 		title,
 		description,
