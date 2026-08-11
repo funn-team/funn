@@ -20,10 +20,12 @@ export function renderListScreen(viewState) {
 		favoriteCount,
 		showOnlyFavorites,
 		sort,
-	} = viewState
+	} = viewState;
 
 	return `
 	<section class="screen">
+		<h1 class="page-title">Alle annonser</h1>
+
 		<div class="search-bar" role="search">
 			<label class="visually-hidden" for="search-field">Søk i annonser</label>
 			<input
@@ -73,7 +75,7 @@ export function renderListScreen(viewState) {
 				: renderListingGrid(visibleListings, favoriteIds)
 		}
 	</section>
-	`
+	`;
 }
 
 function renderListingGrid(listings, favoriteIds) {
@@ -85,9 +87,9 @@ function renderListingGrid(listings, favoriteIds) {
 }
 
 function renderCard(listing, favoriteIds) {
-	const city = listing.location?.city ?? ""
-	const isFavorite = favoriteIds.includes(listing.id)
 	const isSold = listing.sold
+	const city = listing.location?.city ?? "";
+	const isFavorite = favoriteIds.includes(listing.id);
 
 	return `
 	<li class="card">
@@ -117,7 +119,7 @@ function renderCard(listing, favoriteIds) {
 			</span>
 		</button>
 	</li>
-	`
+	`;
 }
 
 function renderThumbnail(listing) {

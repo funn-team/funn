@@ -53,6 +53,40 @@ body {
 	outline-offset: 2px;
 }
 
+/* Sits off-screen until it is tabbed to, then slides into the top-left.
+   Never display: none — that would take it out of the tab order and defeat
+   the point. */
+.skip-link {
+	position: absolute;
+	top: -4rem;
+	left: var(--space-2);
+	z-index: 10;
+	padding: 0.6rem 0.9rem;
+	background: var(--accent);
+	color: var(--accent-text);
+	font-weight: 600;
+	text-decoration: none;
+	border-radius: var(--radius);
+	transition: top 0.15s ease-out;
+}
+
+.skip-link:focus {
+	top: var(--space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.skip-link {
+		transition: none;
+	}
+}
+
+/* #main and the screen headings are focused programmatically, never tabbed
+   to, so the focus ring would only ever be noise. */
+#main:focus,
+.screen h1:focus {
+	outline: none;
+}
+
 /* Available to screen readers, hidden visually. */
 .visually-hidden {
 	position: absolute;

@@ -22,18 +22,57 @@ const screens = {
 	list: renderListScreen,
 	detail: renderDetailScreen,
 	new: renderNewListingScreen,
-	edit: renderNewListingScreen
+	edit: renderNewListingScreen,
 };
 
 export function createView(rootEl) {
 	const output = rootEl.querySelector("#main");
 	if (!output) throw new Error('Missing <main id="main"> inside #app');
 
+	const status = rootEl.querySelector("#status");
+
+	// null until the first render, so the first screen does not steal focus
+	// from wherever the user actually is when the page loads.
+	let lastScreen = null;
+
 	function render(viewState) {
 		const draw = screens[viewState.screen] ?? renderListScreen;
+		const screenChanged =
+			lastScreen !== null && lastScreen !== viewState.screen;
 		const focus = readFocus();
+
 		output.innerHTML = draw(viewState);
+		lastScreen = viewState.screen;
+		announce(viewState);
+
+		// On a screen change the element that had focus no longer exists, so
+		// restoring it is meaningless — move to the new heading instead.
+		if (screenChanged) {
+			focusHeading();
+			return;
+		}
 		restoreFocus(focus);
+	}
+
+	/* Sends focus to the heading of the screen we just drew. A screen reader
+	   then reads out where it landed, and a keyboard user starts at the top
+	   of the new content rather than back at the top of the document. */
+	function focusHeading() {
+		const heading = output.querySelector("h1");
+		if (!heading) return;
+		heading.setAttribute("tabindex", "-1");
+		heading.focus();
+	}
+
+	/* The visible result count is inside #main and is destroyed on every
+	   render, which stops it working as a live region. #status lives outside
+	   #main and only ever has its text replaced, so the announcement fires. */
+	function announce(viewState) {
+		if (!status) return;
+		status.textContent =
+			viewState.screen === "list"
+				? `Viser ${viewState.visibleListings.length} av ${viewState.totalCount} annonser`
+				: "";
 	}
 
 	/* The whole screen is redrawn on every change. Without this, the search
