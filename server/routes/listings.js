@@ -37,7 +37,7 @@ listingsRouter.get("/:id", async (req, res) => {
 		req.params.id,
 	]);
 
-	if (rows.length === 0) return res.status(404).json({});
+	if (rowCount === 0) return res.status(404).json({ error: "Not found" });
 
 	res.json(rowToListing(rows[0]));
 });
@@ -53,6 +53,10 @@ listingsRouter.post("/", async (req, res) => {
 		seller,
 		location,
 	} = req.body;
+
+	if (!seller || !location) {
+		return res.status(400).json({ error: "Selger og sted er nødvendig" });
+	}
 
 	const { rows } = await pool.query(
 		`INSERT INTO listings
@@ -91,6 +95,10 @@ listingsRouter.patch("/:id", async (req, res) => {
 		seller,
 		location,
 	} = req.body;
+
+	if (!seller || !location) {
+		return res.status(400).json({ error: "Selger og sted er nødvendig" });
+	}
 
 	const { rows } = await pool.query(
 		`UPDATE listings SET

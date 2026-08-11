@@ -51,6 +51,7 @@ export function createModel() {
 
 		loading: true,
 		loadError: false,
+		actionError: false,
 	};
 
 	function readFavoritesFromStorage() {
@@ -171,6 +172,7 @@ export function createModel() {
 
 			loading: state.loading,
 			loadError: state.loadError,
+			actionError: state.actionError,
 		};
 	}
 
@@ -221,20 +223,25 @@ export function createModel() {
 		notify();
 	}
 
-	async function confirmDelete() {
+	async function withActionError(fn) {
 		try {
-			await fetchDeleteListing(state.confirmDeleteId);
+			await fn();
 		} catch {
 			state.actionError = true;
 			notify();
-			return;
 		}
+	}
 
-		state.listings = state.listings.filter(
-			(listing) => listing.id !== state.confirmDeleteId,
-		);
+	async function confirmDelete() {
+		await withActionError(async () => {
+			await fetchDeleteListing(state.confirmDeleteId);
 
-		showList();
+			state.listings = state.listings.filter(
+				(listing) => listing.id !== state.confirmDeleteId,
+			);
+
+			showList();
+		});
 	}
 
 	async function updateListing(id, input) {
@@ -256,19 +263,15 @@ export function createModel() {
 			},
 		};
 
-		try {
-			await fetchUpdateListing(id, input);
-		} catch {
-			state.actionError = true;
-			notify();
-			return;
-		}
+		await withActionError(async () => {
+			await fetchUpdateListing(id, updated);
 
-		state.listings = state.listings.map((listing) =>
-			listing.id === id ? { ...listing, ...updated } : listing,
-		);
+			state.listings = state.listings.map((listing) =>
+				listing.id === id ? { ...listing, ...updated } : listing,
+			);
 
-		showDetail(id);
+			showDetail(id);
+		});
 	}
 
 	function setSearch(text) {
@@ -318,14 +321,12 @@ export function createModel() {
 
 	async function addListing(input) {
 		const listing = {
-			id: crypto.randomUUID(),
 			title: input.title,
 			price: Number(input.price),
 			category: input.category,
 			description: input.description,
 			condition: input.condition,
 			imageUrl: input.imageUrl ?? "",
-			createdAt: new Date().toISOString().slice(0, 10),
 			seller: {
 				name: input.sellerName,
 				phone: input.sellerPhone,
@@ -344,17 +345,13 @@ export function createModel() {
 			return;
 		}
 
-		try {
-			fetchCreateListing(listing);
-		} catch {
-			state.actionError = true;
-			notify();
-			return;
-		}
+		await withActionError(async () => {
+			const created = await fetchCreateListing(listing);
 
-		clearFormValues();
-		state.listings = [listing, ...state.listings];
-		showDetail(listing.id);
+			clearFormValues();
+			state.listings = [created, ...state.listings];
+			showDetail(created.id);
+		});
 	}
 
 	function validateListing(listing) {
