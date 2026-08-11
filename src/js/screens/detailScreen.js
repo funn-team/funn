@@ -5,7 +5,12 @@
    Maintainer: see README. Anyone may work here — say so first.
    ====================================================================== */
 
-import { escapeHtml, formatPrice, safeImageUrl } from "../format.js";
+import {
+	escapeHtml,
+	formatDate,
+	formatPrice,
+	safeImageUrl,
+} from "../format.js";
 
 export function renderDetailScreen(viewState) {
 	const listing = viewState.selectedListing;
@@ -56,7 +61,7 @@ export function renderDetailScreen(viewState) {
 					<dt>Sted</dt>
 					<dd>${renderLocation(listing)}</dd>
 					<dt>Lagt ut</dt>
-					<dd>${escapeHtml(listing.createdAt)}</dd>
+					<dd>${escapeHtml(formatDate(listing.createdAt))}</dd>
 				</dl>
 
 				<p class="detail__description">${escapeHtml(listing.description)}</p>
@@ -99,8 +104,8 @@ function renderSeller(listing) {
 	`;
 }
 
-function renderDeleteConfirm(listing, confirmDeleteId){
-	if (confirmDeleteId !== listing.id) return ""
+function renderDeleteConfirm(listing, confirmDeleteId) {
+	if (confirmDeleteId !== listing.id) return "";
 
 	return `
 		<div class="popupConfirm">
@@ -108,5 +113,5 @@ function renderDeleteConfirm(listing, confirmDeleteId){
 			<button class="button" type="button" data-action="confirmDelete">Ja, slett</button>
 			<button class="button button--quiet" type="button" data-action="cancelDelete">Avbryt</button>
 		</div>
-	`
+	`;
 }
