@@ -391,14 +391,8 @@ export function createModel() {
 		return errors;
 	}
 
-	// Called once by the controller to draw the first screen.
-	function start() {
-		notify();
-	}
-
 	return {
 		subscribe,
-		start,
 		showList,
 		showDetail,
 		showNew,
