@@ -81,6 +81,7 @@ const listingExample = {
 	},
 
 	/** @type {boolean} **/
+	sold: false,
 };
 
 /** @type {typeof listingExample[]} **/
