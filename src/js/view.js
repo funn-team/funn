@@ -87,15 +87,28 @@ export function createView(rootEl) {
 		} catch {
 			// Some input types do not support selectionStart. Skip it.
 		}
-		return { action: active.dataset.action, caret };
+		return {
+			action: active.dataset.action,
+			id: active.dataset.id ?? null,
+			caret,
+		};
 	}
 
 	function restoreFocus(focus) {
 		if (!focus) return;
-		const field = output.querySelector(`[data-action="${focus.action}"]`);
+
+		const selector = focus.id
+			? `[data-action="${focus.action}"][data-id="${focus.id}"]`
+			: `[data-action]="${focus.action}"]`;
+
+		const field = output.querySelector(selector);
+
 		if (!field) return;
-		field.focus();
+
+		field.focus({ preventScroll: true });
+
 		if (focus.caret === null) return;
+
 		try {
 			field.setSelectionRange(focus.caret, focus.caret);
 		} catch {

@@ -1,6 +1,6 @@
 const BASE_URL = "http://localhost:3000/api/listings";
 
-export async function fetchListings() {
+export async function fetchGetListings() {
 	const res = await fetch(BASE_URL);
 
 	if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
@@ -8,7 +8,7 @@ export async function fetchListings() {
 	return res.json();
 }
 
-export async function createListing(input) {
+export async function fetchCreateListing(input) {
 	const res = await fetch(BASE_URL, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
@@ -20,7 +20,7 @@ export async function createListing(input) {
 	return res.json();
 }
 
-export async function updateListing(id, input) {
+export async function fetchUpdateListing(id, input) {
 	const res = await fetch(`${BASE_URL}/${id}`, {
 		method: "PATCH",
 		headers: { "Content-Type": "application/json" },
@@ -32,7 +32,7 @@ export async function updateListing(id, input) {
 	return res.json();
 }
 
-export async function deleteListing(id) {
+export async function fetchDeleteListing(id) {
 	const res = await fetch(`${BASE_URL}/${id}`, {
 		method: "DELETE",
 	});

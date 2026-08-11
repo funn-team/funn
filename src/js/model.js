@@ -11,7 +11,12 @@
    ====================================================================== */
 
 import { CONDITIONS } from "#/data/seed.data";
-import { fetchListings } from "./api";
+import {
+	fetchCreateListing,
+	fetchGetListings,
+	fetchUpdateListing,
+	fetchDeleteListing,
+} from "./api";
 
 const FAVORITES_KEY = "funn:favorites";
 
@@ -230,48 +235,65 @@ function buildViewState() {
 		notify();
 	}
 
-	function confirmDelete() {
+	async function confirmDelete() {
+		try {
+			await fetchDeleteListing(state.confirmDeleteId);
+		} catch {
+			state.actionError = true;
+			notify();
+			return;
+		}
+
 		state.listings = state.listings.filter(
 			(listing) => listing.id !== state.confirmDeleteId,
 		);
-		writeToStorage();
+
 		showList();
 	}
 
-	function updateListing(id, input) {
-	const listing = state.listings.find((item) => item.id === id);
-	if (!listing) return;
+	async function updateListing(id, input) {
+		const listing = state.listings.find((item) => item.id === id);
+		if (!listing) return;
 
-	const updated = {
-		...listing,
-		title: input.title,
-		price: Number(input.price),
-		category: input.category,
-		description: input.description,
-		condition: input.condition,
-		imageUrl: input.imageUrl ?? "",
-		seller: {
-			name: input.sellerName,
-			phone: input.sellerPhone,
-			email: input.sellerEmail,
-		},
-		location: { city: input.city, zip: input.zip },
-	};
+		const updated = {
+			...listing,
+			title: input.title,
+			price: Number(input.price),
+			category: input.category,
+			description: input.description,
+			condition: input.condition,
+			imageUrl: input.imageUrl ?? "",
+			seller: {
+				name: input.sellerName,
+				phone: input.sellerPhone,
+				email: input.sellerEmail,
+			},
+			location: { city: input.city, zip: input.zip },
+		};
 
-	const errors = validateListing(updated);
-	if (Object.keys(errors).length > 0) {
-		state.form.errors = errors;
-		notify();
-		return;
-	}
+		const errors = validateListing(updated);
+		if (Object.keys(errors).length > 0) {
+			state.form.errors = errors;
+			notify();
+			return;
+		}
 
-	state.form.errors = {};
-	state.listings = state.listings.map((item) =>
-		item.id === id ? updated : item,
-	);
-	writeToStorage();
-	showDetail(id);
-	return updated;
+		state.form.errors = {};
+
+		try {
+			await fetchUpdateListing(id, updated);
+		} catch {
+			state.actionError = true;
+			notify();
+			return;
+		}
+
+		state.listings = state.listings.map((item) =>
+			item.id === id ? updated : item,
+		);
+
+		showDetail(id);
+		return updated;
 	}
 
 	function setSearch(text) {
@@ -326,18 +348,8 @@ function buildViewState() {
 	   are named city and zip. They are assembled into seller and location,
 	   two sibling objects on the listing. Renaming a field in the form means
 	   renaming it here too. */
-	function addListing(input) {
-		const location = {
-			city: input.city,
-			zip: input.zip,
-		};
 
-		const seller = {
-			name: input.sellerName,
-			phone: input.sellerPhone,
-			email: input.sellerEmail,
-		};
-
+	async function addListing(input) {
 		const listing = {
 			id: crypto.randomUUID(),
 			title: input.title,
@@ -348,24 +360,35 @@ function buildViewState() {
 			imageUrl: input.imageUrl ?? "",
 			createdAt: new Date().toISOString().slice(0, 10),
 			sold: false,
-			seller,
-			location,
+			seller: {
+				name: input.sellerName,
+				phone: input.sellerPhone,
+				email: input.sellerEmail,
+			},
+			location: {
+				city: input.city,
+				zip: input.zip,
+			},
 		};
 
 		const errors = validateListing(listing);
-
 		if (Object.keys(errors).length > 0) {
 			state.form.errors = errors;
 			notify();
 			return;
 		}
 
-		clearFormValues();
+		try {
+			fetchCreateListing(listing);
+		} catch {
+			state.actionError = true;
+			notify();
+			return;
+		}
 
+		clearFormValues();
 		state.listings = [listing, ...state.listings];
-		writeToStorage();
 		showDetail(listing.id);
-		return listing;
 	}
 
 	function setMinPrice(value) {
@@ -423,7 +446,7 @@ function buildViewState() {
 		notify();
 
 		try {
-			state.listings = await fetchListings();
+			state.listings = await fetchGetListings();
 		} catch {
 			state.loadError = true;
 		} finally {
