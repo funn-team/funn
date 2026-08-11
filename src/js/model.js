@@ -224,8 +224,9 @@ export function createModel() {
 	}
 
 	async function withActionError(fn) {
+		state.actionError = false;
 		try {
-			await fn();
+			return await fn();
 		} catch {
 			state.actionError = true;
 			notify();
@@ -245,7 +246,11 @@ export function createModel() {
 	}
 
 	async function updateListing(id, input) {
+		const listing = state.listings.find((item) => item.id === id);
+		if (!listing) return;
+
 		const updated = {
+			...listing,
 			title: input.title,
 			price: Number(input.price),
 			category: input.category,
@@ -263,14 +268,24 @@ export function createModel() {
 			},
 		};
 
-		await withActionError(async () => {
+		const errors = validateListing(updated);
+		if (Object.keys(errors).length > 0) {
+			state.form.errors = errors;
+			notify();
+			return;
+		}
+
+		state.form.errors = {};
+
+		return await withActionError(async () => {
 			await fetchUpdateListing(id, updated);
 
-			state.listings = state.listings.map((listing) =>
-				listing.id === id ? { ...listing, ...updated } : listing,
+			state.listings = state.listings.map((item) =>
+				item.id === id ? updated : item,
 			);
 
 			showDetail(id);
+			return updated;
 		});
 	}
 
@@ -313,6 +328,23 @@ export function createModel() {
 		state.form.errors = {};
 	}
 
+	async function toggleSold(id) {
+		const listing = state.listings.find((item) => item.id === id);
+		if (!listing) return;
+
+		const updated = { ...listing, sold: !listing.sold };
+
+		await withActionError(async () => {
+			await fetchUpdateListing(id, updated);
+
+			state.listings = state.listings.map((item) =>
+				item.id === id ? updated : item,
+			);
+
+			notify();
+		});
+	}
+
 	/* input comes from FormData, which is always flat. The seller fields are
 	   named sellerName, sellerPhone and sellerEmail, and the location fields
 	   are named city and zip. They are assembled into seller and location,
@@ -327,6 +359,7 @@ export function createModel() {
 			description: input.description,
 			condition: input.condition,
 			imageUrl: input.imageUrl ?? "",
+			sold: false,
 			seller: {
 				name: input.sellerName,
 				phone: input.sellerPhone,
@@ -345,12 +378,13 @@ export function createModel() {
 			return;
 		}
 
-		await withActionError(async () => {
+		return await withActionError(async () => {
 			const created = await fetchCreateListing(listing);
 
 			clearFormValues();
 			state.listings = [created, ...state.listings];
 			showDetail(created.id);
+			return created;
 		});
 	}
 
@@ -364,8 +398,7 @@ export function createModel() {
 		const isValidEmail = (email) =>
 			/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
-		const isValidPhone = (phone) =>
-			/^\d{8,}$/.test(phone.replace(/\s/g, ""));
+		const isValidPhone = (phone) => /^\+?\d{8,}$/.test(phone.replace(/\s/g, ""));
 
 		const isValidZip = (zip) => /^\d{4}$/.test(zip);
 
@@ -426,6 +459,7 @@ export function createModel() {
 		setSort,
 		setFormValue,
 		addListing,
+		toggleSold,
 		toggleFavorite,
 		toggleFavoritesFilter,
 	};

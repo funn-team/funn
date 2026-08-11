@@ -13,6 +13,7 @@ const rowToListing = (row) => ({
 	condition: row.condition,
 	imageUrl: row.image_url,
 	createdAt: row.created_at.toISOString().slice(0, 10),
+	sold: row.sold,
 	seller: {
 		name: row.seller_name,
 		phone: row.seller_phone,
@@ -92,6 +93,7 @@ listingsRouter.patch("/:id", async (req, res) => {
 		category,
 		condition,
 		imageUrl,
+		sold,
 		seller,
 		location,
 	} = req.body;
@@ -102,12 +104,12 @@ listingsRouter.patch("/:id", async (req, res) => {
 
 	const { rows } = await pool.query(
 		`UPDATE listings SET
-				title = $1, description = $2, price = $3, category = $4, condition = $5,
-				image_url = $6, seller_name = $7, seller_phone = $8, seller_email = $9,
-				city = $10, zip = $11
-		WHERE id = $12
+                              title = $1, description = $2, price = $3, category = $4, condition = $5,
+                              image_url = $6, seller_name = $7, seller_phone = $8, seller_email = $9,
+                              city = $10, zip = $11, sold = $12
+              WHERE id = $13
 
-		RETURNING *`,
+              RETURNING *`,
 
 		[
 			title,
@@ -121,6 +123,7 @@ listingsRouter.patch("/:id", async (req, res) => {
 			seller.email,
 			location.city,
 			location.zip,
+			sold ?? false,
 			req.params.id,
 		],
 	);
@@ -131,10 +134,9 @@ listingsRouter.patch("/:id", async (req, res) => {
 });
 
 listingsRouter.delete("/:id", async (req, res) => {
-	const { rowCount } = await pool.query(
-		"DELETE FROM listings WHERE id = $1",
-		[req.params.id],
-	);
+	const { rowCount } = await pool.query("DELETE FROM listings WHERE id = $1", [
+		req.params.id,
+	]);
 
 	if (rowCount === 0) return res.status(404).json({ error: "Not found" });
 

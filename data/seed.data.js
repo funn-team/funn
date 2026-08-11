@@ -63,6 +63,9 @@ const listingExample = {
 		city: "Lillehammer",
 		zip: "2609",
 	},
+
+	/** @type {boolean} **/
+	sold: false,
 };
 
 /** @type {typeof listingExample[]} **/
@@ -77,6 +80,7 @@ export const seedListings = [
 			"https://images.pexels.com/photos/7614428/pexels-photo-7614428.jpeg",
 		createdAt: "2026-08-03",
 		condition: "Pent brukt",
+		sold: false,
 		seller: {
 			name: "Ola Nordmann",
 			phone: "+47 400 00 001",
@@ -97,6 +101,7 @@ export const seedListings = [
 			"https://images.pexels.com/photos/4846097/pexels-photo-4846097.jpeg",
 		createdAt: "2026-08-04",
 		condition: "Synlig brukt",
+		sold: false,
 		seller: {
 			name: "Kari Haugen",
 			phone: "+47 400 00 002",
@@ -114,9 +119,10 @@ export const seedListings = [
 		category: "Møbler og interiør",
 		description: "Elektrisk. Fungerer som det skal, hentes selv.",
 		imageUrl:
-			"https://images.pexels.com/photos/36181031/pexels-photo-36181031.jpeg",
+			"https://images.pexels.com/photos/8001034/pexels-photo-8001034.jpeg",
 		createdAt: "2026-08-04",
 		condition: "Brukt",
+		sold: false,
 		seller: {
 			name: "Per Solberg",
 			phone: "+47 400 00 003",
@@ -137,6 +143,7 @@ export const seedListings = [
 			"https://images.pexels.com/photos/9281230/pexels-photo-9281230.jpeg",
 		createdAt: "2026-08-05",
 		condition: "Ny / ubrukt",
+		sold: false,
 		seller: {
 			name: "Mona Iversen",
 			phone: "+47 400 00 004",
@@ -157,6 +164,7 @@ export const seedListings = [
 			"https://images.pexels.com/photos/37002235/pexels-photo-37002235.jpeg",
 		createdAt: "2026-08-05",
 		condition: "Brukt",
+		sold: false,
 		seller: {
 			name: "Erik Fjeld",
 			phone: "+47 400 00 005",
@@ -177,6 +185,7 @@ export const seedListings = [
 			"https://images.pexels.com/photos/5094359/pexels-photo-5094359.jpeg",
 		createdAt: "2026-08-06",
 		condition: "Ødelagt / trenger reparasjon",
+		sold: true,
 		seller: {
 			name: "Silje Berg",
 			phone: "+47 400 00 006",
@@ -194,9 +203,10 @@ export const seedListings = [
 		category: "Fritid, hobby og underholdning",
 		description: "Selges samlet med liten øvingsforsterker og kabel.",
 		imageUrl:
-			"https://images.pexels.com/photos/31246540/pexels-photo-31246540.jpeg",
+			"https://images.pexels.com/photos/375893/pexels-photo-375893.jpeg",
 		createdAt: "2026-07-28",
 		condition: "Pent brukt",
+		sold: false,
 		seller: {
 			name: "Jonas Lien",
 			phone: "+47 400 00 007",
@@ -214,9 +224,10 @@ export const seedListings = [
 		category: "Dyr og utstyr",
 		description: "Halvannen meter høyt. Vasket, litt slitt på toppen.",
 		imageUrl:
-			"https://images.pexels.com/photos/32557420/pexels-photo-32557420.jpeg",
+			"https://images.pexels.com/photos/2083940/pexels-photo-2083940.jpeg",
 		createdAt: "2026-07-30",
 		condition: "Brukt",
+		sold: false,
 		seller: {
 			name: "Ingrid Moen",
 			phone: "+47 400 00 008",
@@ -237,6 +248,7 @@ export const seedListings = [
 			"https://images.pexels.com/photos/19129082/pexels-photo-19129082.jpeg",
 		createdAt: "2026-08-01",
 		condition: "Pent brukt",
+		sold: false,
 		seller: {
 			name: "Hanne Dahl",
 			phone: "+47 400 00 009",
@@ -255,9 +267,10 @@ export const seedListings = [
 		description:
 			"Fem hyller, 180 cm høy. Må hentes, tas ikke fra hverandre.",
 		imageUrl:
-			"https://images.pexels.com/photos/38481083/pexels-photo-38481083.jpeg",
+			"https://images.pexels.com/photos/2883049/pexels-photo-2883049.jpeg",
 		createdAt: "2026-08-02",
 		condition: "Brukt",
+		sold: false,
 		seller: {
 			name: "Trond Aasen",
 			phone: "+47 400 00 010",
@@ -278,6 +291,7 @@ export const seedListings = [
 			"https://images.pexels.com/photos/6598820/pexels-photo-6598820.jpeg",
 		createdAt: "2026-08-06",
 		condition: "Pent brukt",
+		sold: false,
 		seller: {
 			name: "Camilla Rud",
 			phone: "+47 400 00 011",
@@ -298,6 +312,7 @@ export const seedListings = [
 			"https://images.pexels.com/photos/4268094/pexels-photo-4268094.jpeg",
 		createdAt: "2026-08-07",
 		condition: "Pent brukt",
+		sold: true,
 		seller: {
 			name: "Marius Strand",
 			phone: "+47 400 00 012",

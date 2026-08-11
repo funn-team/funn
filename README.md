@@ -12,6 +12,7 @@ Built by [funn-team](https://github.com/funn-team), five developers-in-training 
 - Post a new listing, with validation on every field
 - Edit or delete a listing
 - Mark listings as favourites and filter down to them — favourites survive a refresh
+- Every screen has its own address, so a listing can be refreshed, bookmarked or shared, and the browser's back button works
 
 Everything is kept in `localStorage`. There is no sign-in, no messaging, no bidding and no payment; those were deliberately left out to keep the scope landable.
 
@@ -48,6 +49,21 @@ The whole screen is redrawn on every change, which has two consequences worth kn
 - Focus would be lost on every keystroke, so `render` saves and restores the focused field and its caret position. On a screen change it moves focus to that screen's `<h1>` instead.
 - A live region inside `#main` would be destroyed at the same moment its text changed, and never announce. `#status` therefore lives outside `#main` in `index.html`, and `view.js` writes into it.
 
+## Routing
+
+The URL decides which screen is shown. `controller.js` listens for `hashchange`, reads the hash and calls the matching model action.
+
+| Hash | Screen |
+|---|---|
+| `#/` | All listings |
+| `#/annonse/<id>` | One listing |
+| `#/ny` | New listing form |
+| `#/rediger/<id>` | Edit an existing listing |
+
+An unknown route falls back to the list, and an id that matches no listing renders "Fant ikke annonsen" rather than an empty screen.
+
+This is the third thing worth knowing before you add a handler: **a handler that changes screen must write a hash, never call `model.showDetail`, `model.showList`, `model.showNew` or `model.showEdit` directly.** Calling the model straight would change the screen while the address bar kept pointing at the old one, and nothing would warn you — the app would look right until someone refreshed. Where the model moves screen by itself, after saving or deleting, the controller rewrites the address with `history.replaceState` so the form or the deleted listing does not stay in the back history.
+
 ## Team
 
 The repository belongs to the [funn-team](https://github.com/funn-team) organization. Every member is an owner with equal access and an equal say.
@@ -69,6 +85,7 @@ The work was split into vertical slices rather than by layer, so everyone wrote 
 | Edit and delete a listing | Kristian | `model.js`, `screens/newListingScreen.js`, `screens/detailScreen.js` |
 | Form validation | Kasper Haugestøl | `model.js`, `screens/newListingScreen.js` |
 | App shell, accessibility, docs | Malin Fossum | `index.html`, `view.js`, `style.css`, `seed.js`, `README.md` |
+| Hash routing | Malin Fossum | `controller.js`, `index.html` |
 
 Search and category filter were built as part of the walking skeleton before the slices were handed out.
 
