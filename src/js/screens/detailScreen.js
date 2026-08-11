@@ -49,7 +49,7 @@ export function renderDetailScreen(viewState) {
 				</button>
 
 					<h1 class="detail__title">${escapeHtml(listing.title)}</h1>
-					<span class="detail__sold.badge">${isSold ? "Solgt" : ""}</span>
+					<span class="detail__sold-badge">${isSold ? "Solgt" : ""}</span>
 					<p class="detail__price">${formatPrice(listing.price)}</p>
 
 
