@@ -7,7 +7,7 @@
    Maintainer: see README. Search and filter is built as a pair.
    ====================================================================== */
 
-import { escapeHtml, formatPrice, safeImageUrl } from "../format.js"
+import { escapeHtml, formatPrice, safeImageUrl } from "../format.js";
 
 export function renderListScreen(viewState) {
 	const {
@@ -19,10 +19,16 @@ export function renderListScreen(viewState) {
 		favoriteIds,
 		favoriteCount,
 		showOnlyFavorites,
-	} = viewState
+		sort,
+		minPrice,
+		maxPrice,
+		categoryCounts,
+	} = viewState;
 
 	return `
 	<section class="screen">
+		<h1 class="page-title">Alle annonser</h1>
+
 		<div class="search-bar" role="search">
 			<label class="visually-hidden" for="search-field">Søk i annonser</label>
 			<input
@@ -34,16 +40,43 @@ export function renderListScreen(viewState) {
 				data-action="search">
 
 			<label class="visually-hidden" for="category-field">Kategori</label>
-			<select id="category-field" class="field" data-action="selectCategory">
-				${categories
-					.map(
-						(name) => `
-					<option value="${escapeHtml(name)}" ${name === category ? "selected" : ""}>
-						${name === "all" ? "Alle kategorier" : escapeHtml(name)}
-					</option>`,
-					)
-					.join("")}
+			<select id="category-field" class="field" data-action="selectCategory"> 
+			${categories .map((name) => { const count = name === "all" 
+				? totalCount : categoryCounts[name] || 0; 
+				return ` <option value="${escapeHtml(name)}" ${name === category ? "selected" : ""}> 
+				${name === "all" ? `Alle kategorier (${count})` : `${escapeHtml(name)} (${count})`} 
+				</option>`; }) .join("")} 
 			</select>
+
+		<div class="search-bar__bottom">
+			<label class="visually-hidden" for="min-price-field">Minimumspris</label>
+			<input
+				id="min-price-field"
+				class="field"
+				type="number"
+				min="0"
+				placeholder="Min pris + enter"
+				value="${escapeHtml(minPrice)}"
+				data-action="setMinPrice">
+
+			<label class="visually-hidden" for="max-price-field">Maksimumspris</label>
+			<input
+				id="max-price-field"
+				class="field"
+				type="number"
+				min="0"
+				placeholder="Maks pris + enter"
+				value="${escapeHtml(maxPrice)}"
+				data-action="setMaxPrice">
+
+			<label class="visually-hidden" for="sort-field">Sortering</label>
+			<select id="sort-field" class="field field--compact" data-action="setSort">
+				<option value="date-desc" ${sort === "date-desc" ? "selected" : ""}>Dato: nyeste først</option>
+				<option value="date-asc" ${sort === "date-asc" ? "selected" : ""}>Dato: eldste først</option>
+				<option value="price-asc" ${sort === "price-asc" ? "selected" : ""}>Pris: lav → høy</option>
+				<option value="price-desc" ${sort === "price-desc" ? "selected" : ""}>Pris: høy → lav</option>
+			</select>
+		</div>
 
 			<label>
 				<input
@@ -64,7 +97,7 @@ export function renderListScreen(viewState) {
 				: renderListingGrid(visibleListings, favoriteIds)
 		}
 	</section>
-	`
+	`;
 }
 
 function renderListingGrid(listings, favoriteIds) {
@@ -72,12 +105,12 @@ function renderListingGrid(listings, favoriteIds) {
 		<ul class="listing-grid">
 			${listings.map((listing) => renderCard(listing, favoriteIds)).join("")}
 		</ul>
-	`
+	`;
 }
 
 function renderCard(listing, favoriteIds) {
-	const city = listing.seller?.location?.city ?? ""
-	const isFavorite = favoriteIds.includes(listing.id)
+	const city = listing.location?.city ?? "";
+	const isFavorite = favoriteIds.includes(listing.id);
 
 	return `
 	<li class="card">
@@ -106,18 +139,19 @@ function renderCard(listing, favoriteIds) {
 			</span>
 		</button>
 	</li>
-	`
+	`;
 }
 
 function renderThumbnail(listing) {
-	const url = safeImageUrl(listing.imageUrl)
-	if (!url) return `<span class="thumbnail thumbnail--empty" aria-hidden="true"></span>`
+	const url = safeImageUrl(listing.imageUrl);
+	if (!url)
+		return `<span class="thumbnail thumbnail--empty" aria-hidden="true"></span>`;
 
 	return `
 		<img class="thumbnail" src="${escapeHtml(url)}" alt="" loading="lazy">
-	`
+	`;
 }
 
 function renderEmptyState() {
-	return `<p class="empty">Ingen annonser passer søket.</p>`
+	return `<p class="empty">Ingen annonser passer søket.</p>`;
 }

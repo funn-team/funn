@@ -144,17 +144,97 @@ body {
 /* ---------- search bar ----------------------------------------------- */
 
 .search-bar {
-	display: flex;
-	flex-direction: column;
+	display: grid;
+	grid-template-columns: 1fr;
 	gap: var(--space-1);
 }
 
 .search-bar .field {
 	min-width: 0;
+	width: 100%;
 }
 
 .search-bar .field--compact {
 	width: 100%;
+}
+
+/* Price inputs */
+.search-bar .price-field {
+	min-width: 0;
+}
+
+/* Favorites checkbox */
+.search-bar label:not(.visually-hidden) {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	white-space: nowrap;
+	color: var(--text);
+	font-size: 0.9rem;
+	cursor: pointer;
+}
+
+.search-bar input[type="checkbox"] {
+	width: 1rem;
+	height: 1rem;
+	margin: 0;
+	accent-color: var(--accent);
+}
+
+
+/* ---------- desktop search layout ----------------------------------- */
+
+@media (min-width: 1024px) {
+	.search-bar {
+		display: grid;
+		grid-template-columns: 3fr 1fr;
+		grid-template-rows: auto auto;
+		gap: 0.5rem;
+		align-items: center;
+	}
+
+	/* Search — large box on the left */
+	.search-bar #search-field {
+		grid-column: 1;
+		grid-row: 1;
+		width: 100%;
+	}
+
+	/* Favorites — top right */
+	.search-bar label:not(.visually-hidden) {
+		grid-column: 2;
+		grid-row: 1;
+		justify-content: flex-start;
+	}
+
+	/* Category — right underneath favorites */
+	.search-bar #category-field {
+		grid-column: 2;
+		grid-row: 2;
+		width: 100%;
+	}
+
+	/*
+	 * Bottom row:
+	 * date + min + max together occupy the left column.
+	 */
+	.search-bar #sort-field {
+		grid-column: 1;
+		grid-row: 2;
+		width: 100%;
+	}
+
+	.search-bar .price-field {
+		width: 100%;
+	}
+
+	/*
+	 * Make the three bottom controls share the left side evenly.
+	 */
+	.search-bar #sort-field,
+	.search-bar .price-field {
+		min-width: 0;
+	}
 }
 
 /* ---------- listing grid --------------------------------------------- */

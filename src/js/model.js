@@ -27,7 +27,15 @@ export function createModel() {
 		category: "all",
 		favoriteIds: readFavoritesFromStorage(),
 		showOnlyFavorites: false,
-	}
+		minPrice: "",
+		maxPrice: "",
+		// options: 'price-asc', 'price-desc', 'date-desc', 'date-asc'
+		sort: "date-desc",
+		form: {
+			values: {},
+			errors: {},
+		},
+	};
 
 	/* ---------- storage ------------------------------------------------ */
 
@@ -82,7 +90,7 @@ export function createModel() {
 		try {
 			localStorage.setItem(
 				FAVORITES_KEY,
-				JSON.stringify(Array.from(state.favorites)),
+				JSON.stringify(Array.from(state.favoriteIds)),
 			)
 		} catch {
 			// Storage full or denied: the app keeps working, the data just
@@ -96,37 +104,89 @@ export function createModel() {
 	   every notify.
 	   -------------------------------------------------------------------- */
 
-	function filterListings(listings, search, category, showOnlyFavorites, favorites) {
-		const text = search.trim().toLowerCase()
+	function filterListings(
+		listings,
+		search,
+		category,
+		showOnlyFavorites,
+		favorites,
+		minPrice,
+		maxPrice
+	) {
+		const text = search.trim().toLowerCase();
 		return listings.filter((listing) => {
-			const matchesText = text === "" || listing.title.toLowerCase().includes(text)
-			const matchesCategory = category === "all" || listing.category === category
-			const matchesFavorites = !showOnlyFavorites || favorites.has(listing.id)
-			return matchesText && matchesCategory && matchesFavorites
-		})
+			const matchesText =
+				text === "" || listing.title.toLowerCase().includes(text);
+			const matchesCategory =
+				category === "all" || listing.category === category;
+			const matchesFavorites = !showOnlyFavorites || favorites.has(listing.id);
+			const matchesMinPrice = minPrice === "" || Number(listing.price) >= Number(minPrice);
+			const matchesMaxPrice = maxPrice === "" || Number(listing.price) <= Number(maxPrice);
+			return matchesText && matchesCategory && matchesFavorites && matchesMinPrice && matchesMaxPrice;
+		});
+	}
+
+	function sortListings(listings, sortKey) {
+		// Operate on a shallow copy so original state is never mutated.
+		const copy = [...listings];
+		switch (sortKey) {
+			case "price-asc":
+				return copy.sort(
+					(a, b) => (Number(a.price) || 0) - (Number(b.price) || 0),
+				);
+			case "price-desc":
+				return copy.sort(
+					(a, b) => (Number(b.price) || 0) - (Number(a.price) || 0),
+				);
+			case "date-asc":
+				// createdAt is stored as ISO YYYY-MM-DD so lexicographic compare works
+				return copy.sort((a, b) =>
+					(a.createdAt || "").localeCompare(b.createdAt || ""),
+				);
+			case "date-desc":
+			default:
+				return copy.sort((a, b) =>
+					(b.createdAt || "").localeCompare(a.createdAt || ""),
+				);
+		}
 	}
 
 	function buildViewState() {
+		const categoryCounts = {};
+
+		state.listings.forEach((listing) => {
+			categoryCounts[listing.category] =
+				(categoryCounts[listing.category] || 0) + 1;
+		});
+		
 	return {
 		screen: state.screen,
 		search: state.search,
 		category: state.category,
+		categoryCounts: categoryCounts,
 
 		visibleListings: filterListings(
 			state.listings,
 			state.search,
 			state.category,
 			state.showOnlyFavorites,
-			state.favoriteIds
+			state.favoriteIds,
+			state.minPrice,
+			state.maxPrice,
 		),
 
 		totalCount: state.listings.length,
+
+		sort: state.sort,
+		minPrice: state.minPrice,
+		maxPrice: state.maxPrice,
 
 		favoriteIds: [...state.favoriteIds],
 		favoriteCount: state.favoriteIds.size,
 		showOnlyFavorites: state.showOnlyFavorites,
 
-		selectedListing: state.listings.find((l) => l.id === state.selectedId) ?? null,
+		selectedListing:
+			state.listings.find((l) => l.id === state.selectedId) ?? null,
 
 		categories: ["all", ...new Set(state.listings.map((l) => l.category))],
 		conditions: CONDITIONS,
@@ -223,6 +283,56 @@ export function createModel() {
 		return listing;
 	}
 
+	function validateListing(listing) {
+		const isValidLength = (text, min = 3, max = 80) =>
+			text.length >= min && text.length <= max;
+
+		const isValidPrice = (price, min = 0, max = 999999) =>
+			Number.isFinite(price) && price >= min && price <= max;
+
+		const isValidEmail = (email) =>
+			/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
+
+		const isValidPhone = (phone) => /^\d{8,}$/.test(phone.replace(/\s/g, ""));
+
+		const isValidZip = (zip) => /^\d{4}$/.test(zip);
+
+		const isValidUrl = (url) => URL.canParse(url);
+
+		const errors = {};
+
+		if (!isValidLength(listing.title, 3, 80))
+			errors.title = "Tittel må være 3–80 tegn";
+		if (!isValidLength(listing.description, 10, 500))
+			errors.description = "Beskrivelse må være minst 10 tegn";
+		if (!isValidPrice(Number(listing.price)))
+			errors.price = "Prisen må være et positivt tall";
+		if (!isValidZip(listing.location.zip))
+			errors.zip = "Postnummer må være 4 sifre";
+		if (!isValidLength(listing.location.city))
+			errors.city = "Sted må være minst 2 tegn";
+		if (!isValidLength(listing.seller.name))
+			errors.sellerName = "Navnet ditt må være minst 3 tegn";
+		if (!isValidEmail(listing.seller.email))
+			errors.sellerEmail = "Ugyldig e-postadresse";
+		if (!isValidPhone(listing.seller.phone))
+			errors.sellerPhone = "Telefonnummer må ha minst 8 sifre";
+		if (listing.imageUrl && !isValidUrl(listing.imageUrl))
+			errors.imageUrl = "Ugyldig URL";
+
+		return errors;
+	}
+
+	function setMinPrice(value) {
+		state.minPrice = value;
+		notify();
+	}
+
+	function setMaxPrice(value) {
+		state.maxPrice = value;
+		notify();
+	}
+
 	// Called once by the controller to draw the first screen.
 	function start() {
 		notify();
@@ -240,5 +350,7 @@ export function createModel() {
 		addListing,
 		toggleFavorite,
 		toggleFavoritesFilter,
-	}
+		setMinPrice,
+		setMaxPrice,
+	};
 }

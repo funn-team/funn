@@ -80,7 +80,29 @@ export function createView(rootEl) {
 		rootEl.addEventListener("input", (event) => {
 			const element = event.target.closest("[data-action]");
 			if (!element || !element.matches("input, select, textarea")) return;
+
+			if (
+				element.dataset.action === "setMinPrice" ||
+				element.dataset.action === "setMaxPrice"
+			) {
+				return;
+			}
+
 			handlers[element.dataset.action]?.(event, element);
+		});
+
+		rootEl.addEventListener("keydown", (event) => {
+			if (event.key !== "Enter") return;
+
+			const element = event.target.closest("[data-action]");
+			if (!element) return;
+
+			if (
+				element.dataset.action === "setMinPrice" ||
+				element.dataset.action === "setMaxPrice"
+			) {
+				handlers[element.dataset.action]?.(event, element);
+			}
 		});
 
 		rootEl.addEventListener("submit", (event) => {
@@ -89,6 +111,8 @@ export function createView(rootEl) {
 			event.preventDefault();
 			handlers[form.dataset.action]?.(event, form);
 		});
+
+		
 	}
 
 	return { render, bindActions };
