@@ -99,6 +99,11 @@ body {
 	white-space: nowrap;
 }
 
+.error {
+	color: #b00020;
+	font-weight: 600;
+}
+
 /* ---------- topbar --------------------------------------------------- */
 
 .topbar {

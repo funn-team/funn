@@ -52,6 +52,7 @@ export function createModel() {
 
 		loading: true,
 		loadError: false,
+		actionError: false,
 	};
 
 	function readFavoritesFromStorage() {
@@ -185,6 +186,7 @@ function buildViewState() {
 
 		loading: state.loading,
 		loadError: state.loadError,
+		actionError: state.actionError,
 	};
 }
 
@@ -235,20 +237,25 @@ function buildViewState() {
 		notify();
 	}
 
-	async function confirmDelete() {
+	async function withActionError(fn) {
 		try {
-			await fetchDeleteListing(state.confirmDeleteId);
+			await fn();
 		} catch {
 			state.actionError = true;
 			notify();
-			return;
 		}
+	}
 
-		state.listings = state.listings.filter(
-			(listing) => listing.id !== state.confirmDeleteId,
-		);
+	async function confirmDelete() {
+		await withActionError(async () => {
+			await fetchDeleteListing(state.confirmDeleteId);
 
-		showList();
+			state.listings = state.listings.filter(
+				(listing) => listing.id !== state.confirmDeleteId,
+			);
+
+			showList();
+		});
 	}
 
 	async function updateListing(id, input) {
@@ -280,20 +287,16 @@ function buildViewState() {
 
 		state.form.errors = {};
 
-		try {
+		return await withActionError(async () => {
 			await fetchUpdateListing(id, updated);
-		} catch {
-			state.actionError = true;
-			notify();
-			return;
-		}
 
-		state.listings = state.listings.map((item) =>
-			item.id === id ? updated : item,
-		);
+			state.listings = state.listings.map((item) =>
+				item.id === id ? updated : item,
+			);
 
-		showDetail(id);
-		return updated;
+			showDetail(id);
+			return updated;
+		});
 	}
 
 	function setSearch(text) {
@@ -351,14 +354,12 @@ function buildViewState() {
 
 	async function addListing(input) {
 		const listing = {
-			id: crypto.randomUUID(),
 			title: input.title,
 			price: Number(input.price),
 			category: input.category,
 			description: input.description,
 			condition: input.condition,
 			imageUrl: input.imageUrl ?? "",
-			createdAt: new Date().toISOString().slice(0, 10),
 			sold: false,
 			seller: {
 				name: input.sellerName,
@@ -378,17 +379,13 @@ function buildViewState() {
 			return;
 		}
 
-		try {
-			fetchCreateListing(listing);
-		} catch {
-			state.actionError = true;
-			notify();
-			return;
-		}
+		await withActionError(async () => {
+			const created = await fetchCreateListing(listing);
 
-		clearFormValues();
-		state.listings = [listing, ...state.listings];
-		showDetail(listing.id);
+			clearFormValues();
+			state.listings = [created, ...state.listings];
+			showDetail(created.id);
+		});
 	}
 
 	function setMinPrice(value) {

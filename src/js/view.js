@@ -30,6 +30,7 @@ export function createView(rootEl) {
 	if (!output) throw new Error('Missing <main id="main"> inside #app');
 
 	const status = rootEl.querySelector("#status");
+	const actionError = rootEl.querySelector("#action-error");
 
 	// null until the first render, so the first screen does not steal focus
 	// from wherever the user actually is when the page loads.
@@ -44,6 +45,7 @@ export function createView(rootEl) {
 		output.innerHTML = draw(viewState);
 		lastScreen = viewState.screen;
 		announce(viewState);
+		announceActionError(viewState);
 
 		// On a screen change the element that had focus no longer exists, so
 		// restoring it is meaningless — move to the new heading instead.
@@ -51,6 +53,7 @@ export function createView(rootEl) {
 			focusHeading();
 			return;
 		}
+
 		restoreFocus(focus);
 	}
 
@@ -73,6 +76,13 @@ export function createView(rootEl) {
 			viewState.screen === "list"
 				? `Viser ${viewState.visibleListings.length} av ${viewState.totalCount} annonser`
 				: "";
+	}
+
+	function announceActionError(viewState) {
+		if (!actionError) return;
+		actionError.textContent = viewState.actionError
+			? "Noe gikk galt. Prøv igjen."
+			: "";
 	}
 
 	/* The whole screen is redrawn on every change. Without this, the search
@@ -99,7 +109,7 @@ export function createView(rootEl) {
 
 		const selector = focus.id
 			? `[data-action="${focus.action}"][data-id="${focus.id}"]`
-			: `[data-action]="${focus.action}"]`;
+			: `[data-action="${focus.action}"]`;
 
 		const field = output.querySelector(selector);
 
