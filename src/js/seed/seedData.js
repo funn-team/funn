@@ -1,19 +1,3 @@
-/* ======================================================================
-   src/js/seed.js — SEED DATA
-   The listings the app starts with, so the demo is never empty. After the
-   first load the data lives in localStorage.
-
-   Norwegian text here is content shown to the user, not identifiers.
-
-   The repo is public, so no seller detail may look like it belongs to a
-   real person. Phone numbers run +47 400 00 00X and are obviously
-   sequential; emails use example.com, which RFC 2606 reserves for
-   documentation and can never be registered. Keep both patterns when
-   adding listings.
-
-   Maintainer: see README. Anyone may add more listings.
-   ====================================================================== */
-
 export const CATEGORIES = [
 	"Sport og friluft",
 	"Møbler og interiør",
@@ -280,7 +264,8 @@ export const seedListings = [
 		title: "Bokhylle i heltre furu",
 		price: 1500,
 		category: "Møbler og interiør",
-		description: "Fem hyller, 180 cm høy. Må hentes, tas ikke fra hverandre.",
+		description:
+			"Fem hyller, 180 cm høy. Må hentes, tas ikke fra hverandre.",
 		imageUrl:
 			"https://images.pexels.com/photos/2883049/pexels-photo-2883049.jpeg",
 		createdAt: "2026-08-02",

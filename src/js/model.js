@@ -8,7 +8,7 @@
    Maintainer: see README. Anyone may work here — say so first.
    ====================================================================== */
 
-import { CONDITIONS, seedListings } from "./seed.js";
+import { CONDITIONS, seedListings } from "./seed/seedData.js";
 
 const STORAGE_KEY = "funn:listings";
 const FAVORITES_KEY = "funn:favorites";
