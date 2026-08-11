@@ -335,6 +335,7 @@ export function createModel() {
 			condition: input.condition,
 			imageUrl: input.imageUrl ?? "",
 			createdAt: new Date().toISOString().slice(0, 10),
+			sold: false,
 			seller,
 			location,
 		};
@@ -396,6 +397,14 @@ export function createModel() {
 		return errors;
 	}
 
+	function toggleSold(id){
+		state.listings = state.listings.map(listing =>
+			listing.id === id ? {...listing, sold: !listing.sold} : listing
+		)
+		writeToStorage()
+		notify()
+	}
+
 	// Called once by the controller to draw the first screen.
 	function start() {
 		notify();
@@ -417,6 +426,7 @@ export function createModel() {
 		setSort,
 		setFormValue,
 		addListing,
+		toggleSold,
 		toggleFavorite,
 		toggleFavoritesFilter,
 	};
