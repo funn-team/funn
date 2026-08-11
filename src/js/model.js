@@ -243,6 +243,8 @@ export function createModel() {
 	}
 
 	function updateListing(id, input) {
+		if (!input.title) return
+		
 		state.listings = state.listings.map((listing) =>
 			listing.id === id
 				? {

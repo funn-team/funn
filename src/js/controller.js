@@ -29,6 +29,8 @@ export function createController({ model, view }) {
 
 			deleteListing: (_event, element) => model.requestDelete(element.dataset.id),
 
+			toggleSold: (_event, element) => model.toggleSold(element.dataset.id),
+
 			confirmDelete: () => model.confirmDelete(),
 
 			cancelDelete: () => model.cancelDelete(),
