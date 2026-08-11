@@ -152,29 +152,31 @@ export function createModel() {
 		}
 	}
 
-	function buildViewState() {
-		const categoryCounts = {};
+function buildViewState() {
+	const categoryCounts = {};
 
-		state.listings.forEach((listing) => {
-			categoryCounts[listing.category] =
-				(categoryCounts[listing.category] || 0) + 1;
-		});
-		
+	state.listings.forEach((listing) => {
+		categoryCounts[listing.category] =
+			(categoryCounts[listing.category] || 0) + 1;
+	});
+
+	const filtered = filterListings(
+		state.listings,
+		state.search,
+		state.category,
+		state.showOnlyFavorites,
+		state.favoriteIds,
+		state.minPrice,
+		state.maxPrice,
+	);
+
 	return {
 		screen: state.screen,
 		search: state.search,
 		category: state.category,
 		categoryCounts: categoryCounts,
 
-		visibleListings: filterListings(
-			state.listings,
-			state.search,
-			state.category,
-			state.showOnlyFavorites,
-			state.favoriteIds,
-			state.minPrice,
-			state.maxPrice,
-		),
+		visibleListings: sortListings(filtered, state.sort),
 
 		totalCount: state.listings.length,
 
@@ -182,23 +184,24 @@ export function createModel() {
 		minPrice: state.minPrice,
 		maxPrice: state.maxPrice,
 
-			favoriteIds: [...state.favoriteIds],
-			favoriteCount: state.favoriteIds.size,
-			showOnlyFavorites: state.showOnlyFavorites,
+		favoriteIds: [...state.favoriteIds],
+		favoriteCount: state.favoriteIds.size,
+		showOnlyFavorites: state.showOnlyFavorites,
 
 		selectedListing:
 			state.listings.find((l) => l.id === state.selectedId) ?? null,
 
-			categories: ["all", ...new Set(state.listings.map((l) => l.category))],
-			conditions: CONDITIONS,
-			confirmDeleteId: state.confirmDeleteId,
+		categories: ["all", ...new Set(state.listings.map((l) => l.category))],
+		conditions: CONDITIONS,
+		confirmDeleteId: state.confirmDeleteId,
 
-			form: {
-				values: state.form.values,
-				errors: state.form.errors,
-			},
-		};
-	}
+		form: {
+			values: state.form.values,
+			errors: state.form.errors,
+		},
+	};
+}
+
 
 	/* ---------- subscribe / notify -------------------------------------- */
 
