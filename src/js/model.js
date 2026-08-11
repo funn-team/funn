@@ -388,46 +388,6 @@ function buildViewState() {
 		return listing;
 	}
 
-	function validateListing(listing) {
-		const isValidLength = (text, min = 3, max = 80) =>
-			text.length >= min && text.length <= max;
-
-		const isValidPrice = (price, min = 0, max = 999999) =>
-			Number.isFinite(price) && price >= min && price <= max;
-
-		const isValidEmail = (email) =>
-			/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
-
-		const isValidPhone = (phone) => /^\d{8,}$/.test(phone.replace(/\s/g, ""));
-
-		const isValidZip = (zip) => /^\d{4}$/.test(zip);
-
-		const isValidUrl = (url) => URL.canParse(url);
-
-		const errors = {};
-
-		if (!isValidLength(listing.title, 3, 80))
-			errors.title = "Tittel må være 3–80 tegn";
-		if (!isValidLength(listing.description, 10, 500))
-			errors.description = "Beskrivelse må være minst 10 tegn";
-		if (!isValidPrice(Number(listing.price)))
-			errors.price = "Prisen må være et positivt tall";
-		if (!isValidZip(listing.location.zip))
-			errors.zip = "Postnummer må være 4 sifre";
-		if (!isValidLength(listing.location.city))
-			errors.city = "Sted må være minst 2 tegn";
-		if (!isValidLength(listing.seller.name))
-			errors.sellerName = "Navnet ditt må være minst 3 tegn";
-		if (!isValidEmail(listing.seller.email))
-			errors.sellerEmail = "Ugyldig e-postadresse";
-		if (!isValidPhone(listing.seller.phone))
-			errors.sellerPhone = "Telefonnummer må ha minst 8 sifre";
-		if (listing.imageUrl && !isValidUrl(listing.imageUrl))
-			errors.imageUrl = "Ugyldig URL";
-
-		return errors;
-	}
-
 	function setMinPrice(value) {
 		state.minPrice = value;
 		notify();
@@ -436,46 +396,6 @@ function buildViewState() {
 	function setMaxPrice(value) {
 		state.maxPrice = value;
 		notify();
-	}
-
-	function validateListing(listing) {
-		const isValidLength = (text, min = 3, max = 80) =>
-			text.length >= min && text.length <= max;
-
-		const isValidPrice = (price, min = 0, max = 999999) =>
-			Number.isFinite(price) && price >= min && price <= max;
-
-		const isValidEmail = (email) =>
-			/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
-
-		const isValidPhone = (phone) => /^\d{8,}$/.test(phone.replace(/\s/g, ""));
-
-		const isValidZip = (zip) => /^\d{4}$/.test(zip);
-
-		const isValidUrl = (url) => URL.canParse(url);
-
-		const errors = {};
-
-		if (!isValidLength(listing.title, 3, 80))
-			errors.title = "Tittel må være 3–80 tegn";
-		if (!isValidLength(listing.description, 10, 500))
-			errors.description = "Beskrivelse må være minst 10 tegn";
-		if (!isValidPrice(Number(listing.price)))
-			errors.price = "Prisen må være et positivt tall";
-		if (!isValidZip(listing.location.zip))
-			errors.zip = "Postnummer må være 4 sifre";
-		if (!isValidLength(listing.location.city))
-			errors.city = "Sted må være minst 2 tegn";
-		if (!isValidLength(listing.seller.name))
-			errors.sellerName = "Navnet ditt må være minst 3 tegn";
-		if (!isValidEmail(listing.seller.email))
-			errors.sellerEmail = "Ugyldig e-postadresse";
-		if (!isValidPhone(listing.seller.phone))
-			errors.sellerPhone = "Telefonnummer må ha minst 8 sifre";
-		if (listing.imageUrl && !isValidUrl(listing.imageUrl))
-			errors.imageUrl = "Ugyldig URL";
-
-		return errors;
 	}
 
 	function setMinPrice(value) {

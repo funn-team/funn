@@ -111,36 +111,39 @@ function renderListingGrid(listings, favoriteIds) {
 function renderCard(listing, favoriteIds) {
 	const city = listing.location?.city ?? "";
 	const isFavorite = favoriteIds.includes(listing.id);
+	const isSold = listing.sold;
 
 	return `
-	<li class="card">
-		<button
-			class="card__favorite"
-			type="button"
-			data-action="toggleFavorite"
-			data-id="${escapeHtml(listing.id)}"
-			aria-pressed="${isFavorite}"
-			aria-label="Favoritt: ${escapeHtml(listing.title)}">
-			${isFavorite ? "★" : "☆"}
-		</button>
+<li class="card">
+	<button
+		class="card__favorite"
+		type="button"
+		data-action="toggleFavorite"
+		data-id="${escapeHtml(listing.id)}"
+		aria-pressed="${isFavorite}"
+		aria-label="Favoritt: ${escapeHtml(listing.title)}">
+		${isFavorite ? "★" : "☆"}
+	</button>
 
-		<button
-			class="card__button"
-			type="button"
-			data-action="showDetail"
-			data-id="${escapeHtml(listing.id)}">
+	<button
+		class="card__button"
+		type="button"
+		data-action="showDetail"
+		data-id="${escapeHtml(listing.id)}">
 
-			${renderThumbnail(listing)}
+		${renderThumbnail(listing)}
 
-			<span class="card__title">${escapeHtml(listing.title)}</span>
-			<span class="card__price">${formatPrice(listing.price)}</span>
-			<span class="card__meta">
-				${escapeHtml(city)} · ${escapeHtml(listing.category)}
-			</span>
-		</button>
-	</li>
-	`;
+		<span class="card__title">${escapeHtml(listing.title)}</span>
+		${isSold ? `<span class="card__sold-badge">Solgt</span>` : ""}
+		<span class="card__price">${formatPrice(listing.price)}</span>
+		<span class="card__meta">
+			${escapeHtml(city)} · ${escapeHtml(listing.category)}
+		</span>
+	</button>
+</li>
+`;
 }
+
 
 function renderThumbnail(listing) {
 	const url = safeImageUrl(listing.imageUrl);
