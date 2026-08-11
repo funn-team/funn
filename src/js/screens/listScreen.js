@@ -23,8 +23,7 @@ export function renderListScreen(viewState) {
 		minPrice,
 		maxPrice,
 		categoryCounts,
-		sort,
-	} = viewState;;
+	} = viewState;
 
 	return `
 	<section class="screen">
@@ -79,14 +78,6 @@ export function renderListScreen(viewState) {
 			</select>
 		</div>
 
-			<label class="visually-hidden" for="sort-field">Sortering</label>
-			<select id="sort-field" class="field field--compact" data-action="setSort">
-				<option value="date-desc" ${sort === "date-desc" ? "selected" : ""}>Dato: nyeste først</option>
-				<option value="date-asc" ${sort === "date-asc" ? "selected" : ""}>Dato: eldste først</option>
-				<option value="price-asc" ${sort === "price-asc" ? "selected" : ""}>Pris: lav → høy</option>
-				<option value="price-desc" ${sort === "price-desc" ? "selected" : ""}>Pris: høy → lav</option>
-			</select>
-
 			<label>
 				<input
 					type="checkbox"
@@ -115,13 +106,11 @@ function renderListingGrid(listings, favoriteIds) {
 			${listings.map((listing) => renderCard(listing, favoriteIds)).join("")}
 		</ul>
 	`;
-	`;
 }
 
 function renderCard(listing, favoriteIds) {
 	const city = listing.location?.city ?? "";
 	const isFavorite = favoriteIds.includes(listing.id);
-	const isSold = listing.sold
 
 	return `
 	<li class="card">
@@ -144,7 +133,6 @@ function renderCard(listing, favoriteIds) {
 			${renderThumbnail(listing)}
 
 			<span class="card__title">${escapeHtml(listing.title)}</span>
-			${isSold ? `<span class="card__sold-badge">Solgt</span>` : ""}
 			<span class="card__price">${formatPrice(listing.price)}</span>
 			<span class="card__meta">
 				${escapeHtml(city)} · ${escapeHtml(listing.category)}
