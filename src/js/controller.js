@@ -23,7 +23,8 @@ export function createController({ model, view }) {
 
 			showNew: () => model.showNew(),
 
-			showDetail: (_event, element) => model.showDetail(element.dataset.id),
+			showDetail: (_event, element) =>
+				model.showDetail(element.dataset.id),
 
 			showEdit: (_event, element) => model.showEdit(element.dataset.id),
 
@@ -36,7 +37,8 @@ export function createController({ model, view }) {
 
 			search: (_event, element) => model.setSearch(element.value),
 
-			selectCategory: (_event, element) => model.setCategory(element.value),
+			selectCategory: (_event, element) =>
+				model.setCategory(element.value),
 
 			setSort: (_event, element) => model.setSort(element.value),
 

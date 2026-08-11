@@ -37,7 +37,8 @@ export function createView(rootEl) {
 
 	function render(viewState) {
 		const draw = screens[viewState.screen] ?? renderListScreen;
-		const screenChanged = lastScreen !== null && lastScreen !== viewState.screen;
+		const screenChanged =
+			lastScreen !== null && lastScreen !== viewState.screen;
 		const focus = readFocus();
 
 		output.innerHTML = draw(viewState);
