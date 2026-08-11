@@ -149,6 +149,12 @@ export function createController({ model, view }) {
 
 			toggleFavoritesFilter: () => model.toggleFavoritesFilter(),
 
+			setMinPrice: (_event, element) => model.setMinPrice(element.value),
+			setMaxPrice: (_event, element) => model.setMaxPrice(element.value),
+
+			setMinPrice: (_event, element) => model.setMinPrice(element.value),
+			setMaxPrice: (_event, element) => model.setMaxPrice(element.value),
+
 			saveListing,
 		});
 

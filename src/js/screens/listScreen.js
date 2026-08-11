@@ -20,7 +20,11 @@ export function renderListScreen(viewState) {
 		favoriteCount,
 		showOnlyFavorites,
 		sort,
-	} = viewState;
+		minPrice,
+		maxPrice,
+		categoryCounts,
+		sort,
+	} = viewState;;
 
 	return `
 	<section class="screen">
@@ -37,16 +41,43 @@ export function renderListScreen(viewState) {
 				data-action="search">
 
 			<label class="visually-hidden" for="category-field">Kategori</label>
-			<select id="category-field" class="field" data-action="selectCategory">
-				${categories
-					.map(
-						(name) => `
-					<option value="${escapeHtml(name)}" ${name === category ? "selected" : ""}>
-						${name === "all" ? "Alle kategorier" : escapeHtml(name)}
-					</option>`,
-					)
-					.join("")}
+			<select id="category-field" class="field" data-action="selectCategory"> 
+			${categories .map((name) => { const count = name === "all" 
+				? totalCount : categoryCounts[name] || 0; 
+				return ` <option value="${escapeHtml(name)}" ${name === category ? "selected" : ""}> 
+				${name === "all" ? `Alle kategorier (${count})` : `${escapeHtml(name)} (${count})`} 
+				</option>`; }) .join("")} 
 			</select>
+
+		<div class="search-bar__bottom">
+			<label class="visually-hidden" for="min-price-field">Minimumspris</label>
+			<input
+				id="min-price-field"
+				class="field"
+				type="number"
+				min="0"
+				placeholder="Min pris + enter"
+				value="${escapeHtml(minPrice)}"
+				data-action="setMinPrice">
+
+			<label class="visually-hidden" for="max-price-field">Maksimumspris</label>
+			<input
+				id="max-price-field"
+				class="field"
+				type="number"
+				min="0"
+				placeholder="Maks pris + enter"
+				value="${escapeHtml(maxPrice)}"
+				data-action="setMaxPrice">
+
+			<label class="visually-hidden" for="sort-field">Sortering</label>
+			<select id="sort-field" class="field field--compact" data-action="setSort">
+				<option value="date-desc" ${sort === "date-desc" ? "selected" : ""}>Dato: nyeste først</option>
+				<option value="date-asc" ${sort === "date-asc" ? "selected" : ""}>Dato: eldste først</option>
+				<option value="price-asc" ${sort === "price-asc" ? "selected" : ""}>Pris: lav → høy</option>
+				<option value="price-desc" ${sort === "price-desc" ? "selected" : ""}>Pris: høy → lav</option>
+			</select>
+		</div>
 
 			<label class="visually-hidden" for="sort-field">Sortering</label>
 			<select id="sort-field" class="field field--compact" data-action="setSort">
@@ -83,6 +114,7 @@ function renderListingGrid(listings, favoriteIds) {
 		<ul class="listing-grid">
 			${listings.map((listing) => renderCard(listing, favoriteIds)).join("")}
 		</ul>
+	`;
 	`;
 }
 
