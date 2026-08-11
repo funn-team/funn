@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"description": "A small marketplace app: post an item for sale, browse the listings, and open one for details.",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"dev": "node --watch server/index.js"
 	},
 	"repository": {
 		"type": "git",
