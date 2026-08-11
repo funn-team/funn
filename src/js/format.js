@@ -21,6 +21,31 @@ export function formatPrice(amount) {
 	return `${new Intl.NumberFormat("nb-NO").format(amount)} kr`;
 }
 
+/* "2026-08-03" -> "3. august 2026"
+
+   The string is split by hand rather than handed to new Date(value): an ISO
+   date is parsed as UTC midnight, which formats as the day before in every
+   timezone behind UTC. Building it from the parts gives local midnight
+   wherever the page is opened.
+
+   Anything that is not a date comes back unchanged, so a listing saved
+   under an older shape shows its raw value instead of "Invalid Date". The
+   stored value itself is never touched — sorting compares createdAt as a
+   string and depends on it staying ISO. */
+export function formatDate(value) {
+	const text = String(value ?? "");
+	const [year, month, day] = text.split("-").map(Number);
+	const date = new Date(year, month - 1, day);
+
+	if (Number.isNaN(date.getTime())) return text;
+
+	return new Intl.DateTimeFormat("nb-NO", {
+		day: "numeric",
+		month: "long",
+		year: "numeric",
+	}).format(date);
+}
+
 /* Image URLs come from the form, so they are user input going straight
    into a src attribute. Only http and https are allowed through —
    anything else returns an empty string and the screen shows a
