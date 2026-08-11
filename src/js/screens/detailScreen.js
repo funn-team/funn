@@ -5,7 +5,12 @@
    Maintainer: see README. Anyone may work here — say so first.
    ====================================================================== */
 
-import { escapeHtml, formatPrice, safeImageUrl } from "../format.js";
+import {
+	escapeHtml,
+	formatDate,
+	formatPrice,
+	safeImageUrl,
+} from "../format.js";
 
 export function renderDetailScreen(viewState) {
 	const listing = viewState.selectedListing;
@@ -54,7 +59,7 @@ export function renderDetailScreen(viewState) {
 					<dt>Sted</dt>
 					<dd>${renderLocation(listing)}</dd>
 					<dt>Lagt ut</dt>
-					<dd>${escapeHtml(listing.createdAt)}</dd>
+					<dd>${escapeHtml(formatDate(listing.createdAt))}</dd>
 				</dl>
 
 				<p class="detail__description">${escapeHtml(listing.description)}</p>
