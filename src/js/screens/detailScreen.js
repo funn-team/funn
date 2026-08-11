@@ -26,6 +26,7 @@ export function renderDetailScreen(viewState) {
 	}
 
 	const isFavorite = favoriteIds.includes(listing.id);
+	const isSold = listing.sold
 
 	return `
 		<section class="screen">
@@ -48,6 +49,7 @@ export function renderDetailScreen(viewState) {
 				</button>
 
 					<h1 class="detail__title">${escapeHtml(listing.title)}</h1>
+					${isSold ? `<span class="detail__sold-badge">Solgt</span>` : ""}
 					<p class="detail__price">${formatPrice(listing.price)}</p>
 
 
@@ -68,6 +70,7 @@ export function renderDetailScreen(viewState) {
 
 				<button class="button button--quiet" type="button" data-action="showEdit" data-id="${listing.id}">Rediger</button>
 				<button class="button button--quiet" type="button" data-action="deleteListing" data-id="${listing.id}">Slett</button>
+				<button class="button button--quiet" type="button" data-action="toggleSold" data-id="${listing.id}">${isSold ? "Merk som ledig" : "Merk som solgt"}</button>
 			</article>
 		</section>
 	`;

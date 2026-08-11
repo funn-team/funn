@@ -239,31 +239,39 @@ export function createModel() {
 	}
 
 	function updateListing(id, input) {
-		state.listings = state.listings.map((listing) =>
-			listing.id === id
-				? {
-						id: listing.id,
-						title: input.title,
-						price: Number(input.price),
-						category: input.category,
-						description: input.description,
-						condition: input.condition,
-						imageUrl: input.imageUrl ?? "",
-						createdAt: listing.createdAt,
-						seller: {
-							name: input.sellerName,
-							phone: input.sellerPhone,
-							email: input.sellerEmail,
-						},
-						location: {
-							city: input.city,
-							zip: input.zip,
-						},
-					}
-				: listing,
-		);
-		writeToStorage();
-		showDetail(id);
+	const listing = state.listings.find((item) => item.id === id);
+	if (!listing) return;
+
+	const updated = {
+		...listing,
+		title: input.title,
+		price: Number(input.price),
+		category: input.category,
+		description: input.description,
+		condition: input.condition,
+		imageUrl: input.imageUrl ?? "",
+		seller: {
+			name: input.sellerName,
+			phone: input.sellerPhone,
+			email: input.sellerEmail,
+		},
+		location: { city: input.city, zip: input.zip },
+	};
+
+	const errors = validateListing(updated);
+	if (Object.keys(errors).length > 0) {
+		state.form.errors = errors;
+		notify();
+		return;
+	}
+
+	state.form.errors = {};
+	state.listings = state.listings.map((item) =>
+		item.id === id ? updated : item,
+	);
+	writeToStorage();
+	showDetail(id);
+	return updated;
 	}
 
 	function setSearch(text) {
@@ -305,6 +313,14 @@ export function createModel() {
 		state.form.errors = {};
 	}
 
+	function toggleSold(id){
+		state.listings = state.listings.map(listing =>
+			listing.id === id ? {...listing, sold: !listing.sold} : listing
+		)
+		writeToStorage()
+		notify()
+	}
+
 	/* input comes from FormData, which is always flat. The seller fields are
 	   named sellerName, sellerPhone and sellerEmail, and the location fields
 	   are named city and zip. They are assembled into seller and location,
@@ -331,6 +347,7 @@ export function createModel() {
 			condition: input.condition,
 			imageUrl: input.imageUrl ?? "",
 			createdAt: new Date().toISOString().slice(0, 10),
+			sold: false,
 			seller,
 			location,
 		};
@@ -361,7 +378,7 @@ export function createModel() {
 		const isValidEmail = (email) =>
 			/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
-		const isValidPhone = (phone) => /^\d{8,}$/.test(phone.replace(/\s/g, ""));
+		const isValidPhone = (phone) => /^\+?\d{8,}$/.test(phone.replace(/\s/g, ""));
 
 		const isValidZip = (zip) => /^\d{4}$/.test(zip);
 
@@ -406,6 +423,7 @@ export function createModel() {
 		setSort,
 		setFormValue,
 		addListing,
+		toggleSold,
 		toggleFavorite,
 		toggleFavoritesFilter,
 	};

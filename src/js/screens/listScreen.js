@@ -89,6 +89,7 @@ function renderListingGrid(listings, favoriteIds) {
 function renderCard(listing, favoriteIds) {
 	const city = listing.location?.city ?? "";
 	const isFavorite = favoriteIds.includes(listing.id);
+	const isSold = listing.sold
 
 	return `
 	<li class="card">
@@ -111,6 +112,7 @@ function renderCard(listing, favoriteIds) {
 			${renderThumbnail(listing)}
 
 			<span class="card__title">${escapeHtml(listing.title)}</span>
+			${isSold ? `<span class="card__sold-badge">Solgt</span>` : ""}
 			<span class="card__price">${formatPrice(listing.price)}</span>
 			<span class="card__meta">
 				${escapeHtml(city)} · ${escapeHtml(listing.category)}
