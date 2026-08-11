@@ -112,7 +112,7 @@ function renderCard(listing, favoriteIds) {
 			${renderThumbnail(listing)}
 
 			<span class="card__title">${escapeHtml(listing.title)}</span>
-			<span class="${isSold ? "card__sold-badge" : ""}">${isSold ? "Solgt" : ""}</span>
+			${isSold ? `<span class="card__sold-badge">Solgt</span>` : ""}
 			<span class="card__price">${formatPrice(listing.price)}</span>
 			<span class="card__meta">
 				${escapeHtml(city)} · ${escapeHtml(listing.category)}

@@ -378,7 +378,7 @@ export function createModel() {
 		const isValidEmail = (email) =>
 			/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
-		const isValidPhone = (phone) => /^\d{8,}$/.test(phone.replace(/\s/g, ""));
+		const isValidPhone = (phone) => /^\+?\d{8,}$/.test(phone.replace(/\s/g, ""));
 
 		const isValidZip = (zip) => /^\d{4}$/.test(zip);
 
