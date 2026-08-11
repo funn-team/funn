@@ -1,3 +1,5 @@
+// @ts-check
+
 /* ======================================================================
    src/js/model.js — MODEL
    All state and all data. No DOM, no timers.
@@ -8,9 +10,9 @@
    Maintainer: see README. Anyone may work here — say so first.
    ====================================================================== */
 
-import { CONDITIONS, seedListings } from "./seed/seedData.js";
+import { CONDITIONS } from "#/data/seed.data";
+import { fetchListings } from "./api";
 
-const STORAGE_KEY = "funn:listings";
 const FAVORITES_KEY = "funn:favorites";
 
 /* Fixed list rather than derived from the data, so the form offers the
@@ -20,56 +22,32 @@ export function createModel() {
 	const listeners = new Set();
 
 	const state = {
-		listings: readFromStorage(),
-		screen: "list", // "list" | "detail" | "new"
+		listings: [],
+
+		//options: "list" | "detail" | "new"
+		screen: "list",
+
 		selectedId: null,
 		search: "",
 		category: "all",
+
 		confirmDeleteId: null,
+
 		favoriteIds: readFavoritesFromStorage(),
 		showOnlyFavorites: false,
 		minPrice: "",
 		maxPrice: "",
 		// options: 'price-asc', 'price-desc', 'date-desc', 'date-asc'
 		sort: "date-desc",
+
 		form: {
 			values: {},
 			errors: {},
 		},
+
+		loading: true,
+		loadError: false,
 	};
-
-	/* ---------- storage ------------------------------------------------ */
-
-	function readFromStorage() {
-		try {
-			const stored = localStorage.getItem(STORAGE_KEY);
-			if (!stored) return [...seedListings];
-
-			const parsed = JSON.parse(stored);
-			// Data saved under an older shape is discarded rather than
-			// rendered as undefined. Cheap insurance while the model is
-			// still changing.
-			if (
-				!Array.isArray(parsed) ||
-				parsed.some((listing) => !listing?.seller || !listing?.location)
-			) {
-				return [...seedListings];
-			}
-			return parsed;
-		} catch {
-			// Corrupt or blocked localStorage must not crash the app.
-			return [...seedListings];
-		}
-	}
-
-	function writeToStorage() {
-		try {
-			localStorage.setItem(STORAGE_KEY, JSON.stringify(state.listings));
-		} catch {
-			// Storage full or denied: the app keeps working, the data just
-			// does not survive a refresh. Better than crashing mid-demo.
-		}
-	}
 
 	function readFavoritesFromStorage() {
 		try {
@@ -199,9 +177,11 @@ function buildViewState() {
 			values: state.form.values,
 			errors: state.form.errors,
 		},
+
+		loading: state.loading,
+		loadError: state.loadError,
 	};
 }
-
 
 	/* ---------- subscribe / notify -------------------------------------- */
 
@@ -438,8 +418,24 @@ function buildViewState() {
 		return errors;
 	}
 
+	// Called once by the controller to draw the first screen.
+	async function start() {
+		notify();
+
+		try {
+			state.listings = await fetchListings();
+		} catch {
+			state.loadError = true;
+		} finally {
+			state.loading = false;
+		}
+
+		notify();
+	}
+
 	return {
 		subscribe,
+		start,
 		showList,
 		showDetail,
 		showNew,

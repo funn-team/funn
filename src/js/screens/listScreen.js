@@ -23,6 +23,8 @@ export function renderListScreen(viewState) {
 		minPrice,
 		maxPrice,
 		categoryCounts,
+		loading,
+		loadError,
 	} = viewState;
 
 	return `
@@ -87,15 +89,26 @@ export function renderListScreen(viewState) {
 			</label>
 		</div>
 
-		<p class="result-count">
-			Viser ${visibleListings.length} av ${totalCount} annonser
-		</p>
+		${
+			!loading && !loadError
+				? `
+			<p class="result-count">
+					Viser ${visibleListings.length} av ${totalCount} annonser
+			</p>
+		`
+				: ""
+		}
 
 		${
-			visibleListings.length === 0
-				? renderEmptyState()
-				: renderListingGrid(visibleListings, favoriteIds)
+			loadError
+				? renderErrorState(loadError)
+				: loading
+					? renderLoadingState()
+					: visibleListings.length === 0
+						? renderEmptyState()
+						: renderListingGrid(visibleListings, favoriteIds)
 		}
+
 	</section>
 	`;
 }
@@ -157,4 +170,12 @@ function renderThumbnail(listing) {
 
 function renderEmptyState() {
 	return `<p class="empty">Ingen annonser passer søket.</p>`;
+}
+
+function renderLoadingState() {
+	return `<div class="loader"></div>`;
+}
+
+function renderErrorState() {
+	return `<p class="error">Kunne ikke laste annonser. Prøv igjen senere.</p>`;
 }
