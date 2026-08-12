@@ -13,3 +13,4 @@ desktop.ini
 # Node (om vi legger til verktøy senere)
 node_modules/
 .env
+dist/
