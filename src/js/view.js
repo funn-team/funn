@@ -107,53 +107,34 @@ export function createView(rootEl) {
 	   handlers = { actionName: (event, element) => {} }
 	   Because they sit on #app and not on the content, they survive the
 	   content being replaced on every render. */
-	function bindActions(handlers) {
-		rootEl.addEventListener("click", (event) => {
-			const element = event.target.closest("[data-action]");
-			if (!element) return;
-			// Form fields are handled by the input listener below.
-			if (element.matches("input, select, textarea, form")) return;
-			if (element.tagName === "A") event.preventDefault();
-			handlers[element.dataset.action]?.(event, element);
-		});
+function bindActions(handlers) {
+	rootEl.addEventListener("click", (event) => {
+		const element = event.target.closest("[data-action]");
+		if (!element) return;
 
-		rootEl.addEventListener("input", (event) => {
-			const element = event.target.closest("[data-action]");
-			if (!element || !element.matches("input, select, textarea")) return;
+		// Form fields are handled by the input listener below.
+		if (element.matches("input, select, textarea, form")) return;
 
-			if (
-				element.dataset.action === "setMinPrice" ||
-				element.dataset.action === "setMaxPrice"
-			) {
-				return;
-			}
+		if (element.tagName === "A") event.preventDefault();
 
-			handlers[element.dataset.action]?.(event, element);
-		});
+		handlers[element.dataset.action]?.(event, element);
+	});
 
-		rootEl.addEventListener("keydown", (event) => {
-			if (event.key !== "Enter") return;
+	rootEl.addEventListener("input", (event) => {
+		const element = event.target.closest("[data-action]");
+		if (!element || !element.matches("input, select, textarea")) return;
 
-			const element = event.target.closest("[data-action]");
-			if (!element) return;
+		handlers[element.dataset.action]?.(event, element);
+	});
 
-			if (
-				element.dataset.action === "setMinPrice" ||
-				element.dataset.action === "setMaxPrice"
-			) {
-				handlers[element.dataset.action]?.(event, element);
-			}
-		});
+	rootEl.addEventListener("submit", (event) => {
+		const form = event.target.closest("form[data-action]");
+		if (!form) return;
 
-		rootEl.addEventListener("submit", (event) => {
-			const form = event.target.closest("form[data-action]");
-			if (!form) return;
-			event.preventDefault();
-			handlers[form.dataset.action]?.(event, form);
-		});
-
-		
-	}
-
-	return { render, bindActions };
+		event.preventDefault();
+		handlers[form.dataset.action]?.(event, form);
+	});
 }
+
+return { render, bindActions };
+};

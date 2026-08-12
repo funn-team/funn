@@ -53,9 +53,9 @@ export function renderListScreen(viewState) {
 			<input
 				id="min-price-field"
 				class="field"
-				type="number"
-				min="0"
-				placeholder="Min pris + enter"
+				type="text"
+				inputmode="numeric"
+				placeholder="Min pris"
 				value="${escapeHtml(minPrice)}"
 				data-action="setMinPrice">
 
@@ -63,9 +63,9 @@ export function renderListScreen(viewState) {
 			<input
 				id="max-price-field"
 				class="field"
-				type="number"
-				min="0"
-				placeholder="Maks pris + enter"
+				type="text"
+				inputmode="numeric"
+				placeholder="Maks pris"
 				value="${escapeHtml(maxPrice)}"
 				data-action="setMaxPrice">
 
