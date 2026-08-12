@@ -135,11 +135,11 @@ export function createController({ model, view }) {
 
 			toggleSold: (_event, element) => model.toggleSold(element.dataset.id),
 
-			confirmDelete: () => {
-				model.confirmDelete();
+			confirmDelete: async () => {
+				const deleted = await model.confirmDelete();
 				// The listing behind the current URL no longer exists, so the
 				// address is replaced rather than added to.
-				syncUrl("/");
+				if (deleted) syncUrl("/");
 			},
 
 			cancelDelete: () => model.cancelDelete(),

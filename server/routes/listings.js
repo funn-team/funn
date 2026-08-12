@@ -4,6 +4,13 @@ import { pool } from "../db.js";
 
 export const listingsRouter = Router();
 
+/* pg parses a DATE column as local midnight, not UTC. toISOString() would
+   convert that to UTC and can shift the day in either direction depending
+   on the server's timezone offset, so read the local components back
+   instead — they match what was actually stored. */
+const toIsoDate = (date) =>
+	`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
 const rowToListing = (row) => ({
 	id: row.id,
 	title: row.title,
@@ -12,7 +19,7 @@ const rowToListing = (row) => ({
 	category: row.category,
 	condition: row.condition,
 	imageUrl: row.image_url,
-	createdAt: row.created_at.toISOString().slice(0, 10),
+	createdAt: toIsoDate(row.created_at),
 	sold: row.sold,
 	seller: {
 		name: row.seller_name,
@@ -38,7 +45,7 @@ listingsRouter.get("/:id", async (req, res) => {
 		req.params.id,
 	]);
 
-	if (rowCount === 0) return res.status(404).json({ error: "Not found" });
+	if (rows.length === 0) return res.status(404).json({ error: "Not found" });
 
 	res.json(rowToListing(rows[0]));
 });
