@@ -92,7 +92,7 @@ export function createModel() {
 			localStorage.setItem(
 				FAVORITES_KEY,
 				JSON.stringify(Array.from(state.favoriteIds)),
-			)
+			);
 		} catch {
 			// Storage full or denied: the app keeps working, the data just
 			// does not survive a refresh. Better than crashing mid-demo.
@@ -398,16 +398,6 @@ function buildViewState() {
 		notify();
 	}
 
-	function setMinPrice(value) {
-		state.minPrice = value;
-		notify();
-	}
-
-	function setMaxPrice(value) {
-		state.maxPrice = value;
-		notify();
-	}
-
 	function validateListing(listing) {
 		const isValidLength = (text, min = 3, max = 80) =>
 			text.length >= min && text.length <= max;
@@ -468,5 +458,5 @@ function buildViewState() {
 		toggleFavoritesFilter,
 		setMinPrice,
 		setMaxPrice,
-	};;
+	};
 }
