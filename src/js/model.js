@@ -207,23 +207,27 @@ function buildViewState() {
 	function showList() {
 		state.screen = "list";
 		state.selectedId = null;
+		state.actionError = false;
 		notify();
 	}
 
 	function showDetail(id) {
 		state.screen = "detail";
 		state.selectedId = id;
+		state.actionError = false;
 		notify();
 	}
 
 	function showNew() {
 		state.screen = "new";
+		state.actionError = false;
 		notify();
 	}
 
 	function showEdit(id) {
 		state.screen = "edit";
 		state.selectedId = id;
+		state.actionError = false;
 		notify();
 	}
 
@@ -247,7 +251,7 @@ function buildViewState() {
 	}
 
 	async function confirmDelete() {
-		await withActionError(async () => {
+		return await withActionError(async () => {
 			await fetchDeleteListing(state.confirmDeleteId);
 
 			state.listings = state.listings.filter(
@@ -255,6 +259,7 @@ function buildViewState() {
 			);
 
 			showList();
+			return true;
 		});
 	}
 

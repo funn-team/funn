@@ -16,6 +16,14 @@ export function renderDetailScreen(viewState) {
 	const listing = viewState.selectedListing;
 	const favoriteIds = viewState.favoriteIds;
 
+	if (!listing && viewState.loading) {
+		return `
+			<section class="screen">
+				<p class="empty">Laster annonse …</p>
+			</section>
+		`;
+	}
+
 	if (!listing) {
 		return `
 			<section class="screen">
