@@ -6,7 +6,10 @@ import express from "express";
 import { listingsRouter } from "./routes/listings.js";
 
 const app = express();
-const distDir = path.join(path.dirname(fileURLToPath(import.meta.url)), "../dist");
+const distDir = path.join(
+	path.dirname(fileURLToPath(import.meta.url)),
+	"../dist",
+);
 
 app.use(cors({ origin: process.env.CLIENT_ORIGIN ?? "http://localhost:5173" }));
 app.use(express.json());
@@ -18,7 +21,9 @@ app.use("/api/listings", listingsRouter);
    /api/* gets index.html, so a refresh or a shared link on a route like
    /annonse/<id> reaches the router in controller.js instead of 404ing. */
 app.use(express.static(distDir));
-app.get(/^(?!\/api\/).*/, (_, res) => res.sendFile(path.join(distDir, "index.html")));
+app.get(/^(?!\/api\/).*/, (_, res) =>
+	res.sendFile(path.join(distDir, "index.html")),
+);
 
 // Last middleware wins the error. Log the detail, return a generic message —
 // the client never needs our stack.

@@ -146,8 +146,7 @@ export function createController({ model, view }) {
 
 			search: (_event, element) => model.setSearch(element.value),
 
-			selectCategory: (_event, element) =>
-				model.setCategory(element.value),
+			selectCategory: (_event, element) => model.setCategory(element.value),
 
 			setSort: (_event, element) => model.setSort(element.value),
 

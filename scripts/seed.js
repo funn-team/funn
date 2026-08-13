@@ -1,7 +1,7 @@
 // @ts-check
 
-import { pool } from "#/server/db.js";
 import { seedListings } from "#/data/seed.data.js";
+import { pool } from "#/server/db.js";
 
 await pool.query("DELETE FROM listings");
 

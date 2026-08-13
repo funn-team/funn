@@ -43,11 +43,14 @@ export function renderListScreen(viewState) {
 
 			<label class="visually-hidden" for="category-field">Kategori</label>
 			<select id="category-field" class="field" data-action="selectCategory"> 
-			${categories .map((name) => { const count = name === "all" 
-				? totalCount : categoryCounts[name] || 0; 
-				return ` <option value="${escapeHtml(name)}" ${name === category ? "selected" : ""}> 
+			${categories
+				.map((name) => {
+					const count = name === "all" ? totalCount : categoryCounts[name] || 0;
+					return ` <option value="${escapeHtml(name)}" ${name === category ? "selected" : ""}> 
 				${name === "all" ? `Alle kategorier (${count})` : `${escapeHtml(name)} (${count})`} 
-				</option>`; }) .join("")} 
+				</option>`;
+				})
+				.join("")} 
 			</select>
 
 		<div class="search-bar__bottom">
@@ -156,7 +159,6 @@ function renderCard(listing, favoriteIds) {
 </li>
 `;
 }
-
 
 function renderThumbnail(listing) {
 	const url = safeImageUrl(listing.imageUrl);

@@ -13,9 +13,9 @@
 import { CONDITIONS } from "#/data/seed.data";
 import {
 	fetchCreateListing,
+	fetchDeleteListing,
 	fetchGetListings,
 	fetchUpdateListing,
-	fetchDeleteListing,
 } from "./api";
 
 const FAVORITES_KEY = "funn:favorites";
@@ -96,7 +96,7 @@ export function createModel() {
 		showOnlyFavorites,
 		favorites,
 		minPrice,
-		maxPrice
+		maxPrice,
 	) {
 		const text = search.trim().toLowerCase();
 		return listings.filter((listing) => {
@@ -105,9 +105,17 @@ export function createModel() {
 			const matchesCategory =
 				category === "all" || listing.category === category;
 			const matchesFavorites = !showOnlyFavorites || favorites.has(listing.id);
-			const matchesMinPrice = minPrice === "" || Number(listing.price) >= Number(minPrice);
-			const matchesMaxPrice = maxPrice === "" || Number(listing.price) <= Number(maxPrice);
-			return matchesText && matchesCategory && matchesFavorites && matchesMinPrice && matchesMaxPrice;
+			const matchesMinPrice =
+				minPrice === "" || Number(listing.price) >= Number(minPrice);
+			const matchesMaxPrice =
+				maxPrice === "" || Number(listing.price) <= Number(maxPrice);
+			return (
+				matchesText &&
+				matchesCategory &&
+				matchesFavorites &&
+				matchesMinPrice &&
+				matchesMaxPrice
+			);
 		});
 	}
 
@@ -128,7 +136,6 @@ export function createModel() {
 				return copy.sort((a, b) =>
 					(a.createdAt || "").localeCompare(b.createdAt || ""),
 				);
-			case "date-desc":
 			default:
 				return copy.sort((a, b) =>
 					(b.createdAt || "").localeCompare(a.createdAt || ""),
@@ -136,59 +143,59 @@ export function createModel() {
 		}
 	}
 
-function buildViewState() {
-	const categoryCounts = {};
+	function buildViewState() {
+		const categoryCounts = {};
 
-	state.listings.forEach((listing) => {
-		categoryCounts[listing.category] =
-			(categoryCounts[listing.category] || 0) + 1;
-	});
+		state.listings.forEach((listing) => {
+			categoryCounts[listing.category] =
+				(categoryCounts[listing.category] || 0) + 1;
+		});
 
-	const filtered = filterListings(
-		state.listings,
-		state.search,
-		state.category,
-		state.showOnlyFavorites,
-		state.favoriteIds,
-		state.minPrice,
-		state.maxPrice,
-	);
+		const filtered = filterListings(
+			state.listings,
+			state.search,
+			state.category,
+			state.showOnlyFavorites,
+			state.favoriteIds,
+			state.minPrice,
+			state.maxPrice,
+		);
 
-	return {
-		screen: state.screen,
-		search: state.search,
-		category: state.category,
-		categoryCounts: categoryCounts,
+		return {
+			screen: state.screen,
+			search: state.search,
+			category: state.category,
+			categoryCounts: categoryCounts,
 
-		visibleListings: sortListings(filtered, state.sort),
+			visibleListings: sortListings(filtered, state.sort),
 
-		totalCount: state.listings.length,
+			totalCount: state.listings.length,
 
-		sort: state.sort,
-		minPrice: state.minPrice,
-		maxPrice: state.maxPrice,
+			sort: state.sort,
+			minPrice: state.minPrice,
+			maxPrice: state.maxPrice,
 
-		favoriteIds: [...state.favoriteIds],
-		favoriteCount: state.favoriteIds.size,
-		showOnlyFavorites: state.showOnlyFavorites,
+			favoriteIds: [...state.favoriteIds],
+			favoriteCount: state.favoriteIds.size,
+			showOnlyFavorites: state.showOnlyFavorites,
 
-		selectedListing:
-			state.listings.find((l) => l.id === state.selectedId) ?? null,
+			selectedListing:
+				state.listings.find((l) => l.id === state.selectedId) ?? null,
 
-		categories: ["all", ...new Set(state.listings.map((l) => l.category))],
-		conditions: CONDITIONS,
-		confirmDeleteId: state.confirmDeleteId,
+			categories: ["all", ...new Set(state.listings.map((l) => l.category))],
+			conditions: CONDITIONS,
+			confirmDeleteId: state.confirmDeleteId,
 
-		form: {
-			values: state.form.values,
-			errors: state.form.errors,
-		},
+			form: {
+				values: state.form.values,
+				errors: state.form.errors,
+			},
 
-		loading: state.loading,
-		loadError: state.loadError,
-		actionError: state.actionError,
-	};
-}
+			loading: state.loading,
+			loadError: state.loadError,
+			actionError: state.actionError,
+		};
+	}
 
 	/* ---------- subscribe / notify -------------------------------------- */
 
@@ -424,7 +431,8 @@ function buildViewState() {
 		const isValidEmail = (email) =>
 			/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
-		const isValidPhone = (phone) => /^\+?\d{8,}$/.test(phone.replace(/\s/g, ""));
+		const isValidPhone = (phone) =>
+			/^\+?\d{8,}$/.test(phone.replace(/\s/g, ""));
 
 		const isValidZip = (zip) => /^\d{4}$/.test(zip);
 

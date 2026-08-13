@@ -11,11 +11,11 @@ A team project at GET Academy: build our own finn.no. This document is what we a
 
 The assignment spans two workshop days plus the daily project slot next week:
 
-| When | What | Hours |
-|---|---|---|
-| Thu 6 Aug – Fri 7 Aug | Workshop days | ~2 full days |
-| Mon 10 – Thu 13 Aug | Project slot 12.15–15.15 | 12 |
-| Fri 14 Aug | Morning, then presentation | ~3 |
+| When                  | What                       | Hours        |
+| --------------------- | -------------------------- | ------------ |
+| Thu 6 Aug – Fri 7 Aug | Workshop days              | ~2 full days |
+| Mon 10 – Thu 13 Aug   | Project slot 12.15–15.15   | 12           |
+| Fri 14 Aug            | Morning, then presentation | ~3           |
 
 That is roughly 20–25 hours of team time, running alongside the first week of the backend course. finn.no has listings, search, maps, messaging, bidding, payment, sign-in and image upload. We have room for four things.
 
@@ -42,11 +42,11 @@ The out-of-scope list is the important one. It is what stops scope creep on Wedn
 
 Vanilla JavaScript in an MVC structure. No build step and no dependencies, so all five of us can run it with one command and nobody loses an afternoon to tooling.
 
-| Layer | Responsibility |
-|---|---|
-| **Model** | All state and data. No DOM, no timers. Announces changes through `subscribe`/`notify`. |
-| **View** | Renders HTML from state and forwards user actions. Changes no state. |
-| **Controller** | Behaviour and event handling. Wires model and view together. |
+| Layer          | Responsibility                                                                         |
+| -------------- | -------------------------------------------------------------------------------------- |
+| **Model**      | All state and data. No DOM, no timers. Announces changes through `subscribe`/`notify`. |
+| **View**       | Renders HTML from state and forwards user actions. Changes no state.                   |
+| **Controller** | Behaviour and event handling. Wires model and view together.                           |
 
 **Data flow, one direction:**
 
@@ -120,14 +120,14 @@ docs/
   2026-08-06-funn-design.md
 ```
 
-| Area | Maintainer |
-|---|---|
-| Model and storage | *assigned at kickoff* |
-| List screen | *assigned at kickoff* |
-| Detail screen | *assigned at kickoff* |
-| New listing form | *assigned at kickoff* |
-| Search and filter | *pair* |
-| App shell, styling, docs | *assigned at kickoff* |
+| Area                     | Maintainer            |
+| ------------------------ | --------------------- |
+| Model and storage        | _assigned at kickoff_ |
+| List screen              | _assigned at kickoff_ |
+| Detail screen            | _assigned at kickoff_ |
+| New listing form         | _assigned at kickoff_ |
+| Search and filter        | _pair_                |
+| App shell, styling, docs | _assigned at kickoff_ |
 
 A maintainer is a first responder, not an owner. Everyone has write access to everything; the split exists so five people do not edit the same file at the same time. Anyone may work anywhere — tell the maintainer first.
 
@@ -135,7 +135,7 @@ Search and filter is deliberately built by a pair, because it touches both the m
 
 ## 6. Conventions
 
-**Language.** All code is English: function names, variables, data fields, file names, CSS classes, `data-action` names and commit messages. Norwegian appears only inside quotes, as text shown to the user. The rule to remember: *if it is not in quotes, it is English.*
+**Language.** All code is English: function names, variables, data fields, file names, CSS classes, `data-action` names and commit messages. Norwegian appears only inside quotes, as text shown to the user. The rule to remember: _if it is not in quotes, it is English._
 
 **Security.** Anything a user typed goes through `escapeHtml` before it reaches `innerHTML`. A listing title containing `<script>` must not be able to run code.
 
@@ -157,7 +157,7 @@ Columns:  Backlog -> To do -> In progress -> Review -> Done
 Labels:   Model · View · Controller · Skeleton · Docs
 ```
 
-Cards are written as user stories: *"As a user I want to search by title, so that I find what I am looking for."* Every card has one name on it. Nobody works on anything that is not on the board — the board is the progress overview the assignment asks for.
+Cards are written as user stories: _"As a user I want to search by title, so that I find what I am looking for."_ Every card has one name on it. Nobody works on anything that is not on the board — the board is the progress overview the assignment asks for.
 
 **Definition of Done.** A card is Done when:
 

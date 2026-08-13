@@ -34,7 +34,7 @@ export function renderDetailScreen(viewState) {
 	}
 
 	const isFavorite = favoriteIds.includes(listing.id);
-	const isSold = listing.sold
+	const isSold = listing.sold;
 
 	return `
 		<section class="screen">

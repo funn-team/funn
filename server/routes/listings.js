@@ -184,10 +184,9 @@ listingsRouter.patch("/:id", async (req, res) => {
 });
 
 listingsRouter.delete("/:id", async (req, res) => {
-	const { rowCount } = await pool.query(
-		"DELETE FROM listings WHERE id = $1",
-		[req.params.id],
-	);
+	const { rowCount } = await pool.query("DELETE FROM listings WHERE id = $1", [
+		req.params.id,
+	]);
 
 	if (rowCount === 0) return res.status(404).json({ error: "Not found" });
 
