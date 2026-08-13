@@ -292,7 +292,10 @@ export function createModel() {
 			return;
 		}
 
-		state.form.errors = {};
+		// Same as addListing: the draft belongs to the form we are leaving, and
+		// would otherwise pre-fill the next new listing with this one's values.
+		clearFormValues();
+
 		state.listings = state.listings.map((item) =>
 			item.id === id ? updated : item,
 		);
@@ -428,7 +431,17 @@ export function createModel() {
 
 		const isValidZip = (zip) => /^\d{4}$/.test(zip);
 
-		const isValidUrl = (url) => URL.canParse(url);
+		/* Matches safeImageUrl, which only renders http and https. Accepting a
+		   javascript: URL here would store a value the view then refuses to
+		   show, and the user would never learn why. */
+		const isValidUrl = (url) => {
+			try {
+				const { protocol } = new URL(url);
+				return protocol === "http:" || protocol === "https:";
+			} catch {
+				return false;
+			}
+		};
 
 		const errors = {};
 
@@ -440,7 +453,8 @@ export function createModel() {
 			errors.price = "Prisen må være et positivt tall";
 		if (!isValidZip(listing.location.zip))
 			errors.zip = "Postnummer må være 4 sifre";
-		if (!isValidLength(listing.location.city))
+		// Two characters, not the default three: Ås and Bø are real places.
+		if (!isValidLength(listing.location.city, 2, 60))
 			errors.city = "Sted må være minst 2 tegn";
 		if (!isValidLength(listing.seller.name))
 			errors.sellerName = "Navnet ditt må være minst 3 tegn";
