@@ -87,12 +87,18 @@ export function createView(rootEl) {
 		} catch {
 			// Some input types do not support selectionStart. Skip it.
 		}
-		return { action: active.dataset.action, caret };
+		return { action: active.dataset.action, id: active.id, caret };
 	}
 
 	function restoreFocus(focus) {
 		if (!focus) return;
-		const field = output.querySelector(`[data-action="${focus.action}"]`);
+		/* The id comes first because a data-action is not unique: every field
+		   on the new-listing form carries data-action="formInput", so matching
+		   on the action alone sends focus to the first one — submit from the
+		   Sted field with an error and the cursor jumps to Tittel. */
+		const field =
+			(focus.id && output.querySelector(`#${CSS.escape(focus.id)}`)) ||
+			output.querySelector(`[data-action="${focus.action}"]`);
 		if (!field) return;
 		field.focus();
 		if (focus.caret === null) return;
