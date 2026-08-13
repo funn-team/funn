@@ -2,17 +2,21 @@
 
 A small marketplace app: post an item for sale, browse the listings, and open one for details.
 
-Built by [funn-team](https://github.com/funn-team), five developers-in-training at GET Academy.
+Built by [funn-team](https://github.com/funn-team), five developers-in-training on GET Prepared.
 
 ## Features
 
-- Browse all listings, with search by title and filter by category
+- Browse all listings, with search by title and filter by category — each category shows how many listings it holds
+- Narrow the list to a price range
 - Sort by price or date, ascending or descending
 - Open a listing for full details and seller contact information
 - Post a new listing, with validation on every field
 - Edit or delete a listing
+- Mark a listing as sold; it stays visible with a *Solgt* badge rather than disappearing
 - Mark listings as favourites and filter down to them — favourites survive a refresh
 - Every screen has its own address, so a listing can be refreshed, bookmarked or shared, and the browser's back button works
+
+All five filters compose: a search, a category, a price range, a sort order and the favourites toggle apply at the same time.
 
 Listings live in a Postgres database behind a small API. Favourites are still kept in `localStorage`, since they're per-browser rather than shared data. There is no sign-in, no messaging, no bidding and no payment; those were deliberately left out to keep the scope landable.
 
@@ -85,12 +89,17 @@ The work was split into vertical slices rather than by layer, so everyone wrote 
 |---|---|---|
 | Sorting by price and date | Rolf Olsen | `model.js`, `screens/listScreen.js`, `controller.js` |
 | Favourites | Rune Smedhaugen | `model.js`, `screens/listScreen.js`, `screens/detailScreen.js` |
+| Price range filter and category counts | Rune Smedhaugen | `model.js`, `screens/listScreen.js`, `style.css` |
 | Edit and delete a listing | Kristian | `model.js`, `screens/newListingScreen.js`, `screens/detailScreen.js` |
+| Sold status | Kristian | `model.js`, `screens/listScreen.js`, `screens/detailScreen.js` |
 | Form validation | Kasper Haugestøl | `model.js`, `screens/newListingScreen.js` |
 | App shell, accessibility, docs | Malin Fossum | `index.html`, `view.js`, `style.css`, `seed.js`, `README.md` |
 | Hash routing | Malin Fossum | `controller.js`, `index.html` |
+| Seed data and date formatting | Malin Fossum | `seed.js`, `format.js` |
 
 Search and category filter were built as part of the walking skeleton before the slices were handed out.
+
+The REST API on Neon Postgres, with Express and Vite, was built on a separate branch and rebased onto `main` once it was verified end to end — see the Stack and Running It sections above.
 
 `model.js` and `controller.js` are shared by every slice. Merge to `main` the same day you finish a layer, and pull `main` before starting the next one — that is what keeps the conflicts small.
 
