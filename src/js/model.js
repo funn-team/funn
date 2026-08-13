@@ -252,7 +252,8 @@ export function createModel() {
 		state.actionError = false;
 		try {
 			return await fn();
-		} catch {
+		} catch (err) {
+			console.error(err);
 			state.actionError = true;
 			notify();
 		}
@@ -298,10 +299,6 @@ export function createModel() {
 			return;
 		}
 
-		// Same as addListing: the draft belongs to the form we are leaving, and
-		// would otherwise pre-fill the next new listing with this one's values.
-		clearFormValues();
-
 		return await withActionError(async () => {
 			await fetchUpdateListing(id, updated);
 
@@ -309,6 +306,11 @@ export function createModel() {
 				item.id === id ? updated : item,
 			);
 
+			// Same as addListing: the draft belongs to the form we are leaving,
+			// and would otherwise pre-fill the next new listing with this one's
+			// values. Cleared only on success, so a failed save leaves the form
+			// as the user left it rather than silently discarding their edits.
+			clearFormValues();
 			showDetail(id);
 			return updated;
 		});
@@ -436,7 +438,7 @@ export function createModel() {
 			text.length >= min && text.length <= max;
 
 		const isValidPrice = (price, min = 0, max = 999999) =>
-			Number.isFinite(price) && price >= min && price <= max;
+			Number.isInteger(price) && price >= min && price <= max;
 
 		const isValidEmail = (email) =>
 			/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
@@ -465,7 +467,7 @@ export function createModel() {
 		if (!isValidLength(listing.description, 10, 500))
 			errors.description = "Beskrivelse må være minst 10 tegn";
 		if (!isValidPrice(Number(listing.price)))
-			errors.price = "Prisen må være et positivt tall";
+			errors.price = "Prisen må være et helt tall, 0 eller høyere";
 		if (!isValidZip(listing.location.zip))
 			errors.zip = "Postnummer må være 4 sifre";
 		// Two characters, not the default three: Ås and Bø are real places.

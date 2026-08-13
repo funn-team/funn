@@ -18,7 +18,7 @@ const toIsoDate = (date) =>
 const isValidLength = (text, min = 3, max = 80) =>
 	typeof text === "string" && text.trim().length >= min && text.length <= max;
 const isValidPrice = (price, min = 0, max = 999999) =>
-	Number.isFinite(price) && price >= min && price <= max;
+	Number.isInteger(price) && price >= min && price <= max;
 const isValidEmail = (email) =>
 	typeof email === "string" &&
 	/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
@@ -26,16 +26,36 @@ const isValidPhone = (phone) =>
 	typeof phone === "string" && /^\+?\d{8,}$/.test(phone.replace(/\s/g, ""));
 const isValidZip = (zip) => typeof zip === "string" && /^\d{4}$/.test(zip);
 
+/* Matches safeImageUrl on the client, which only renders http and https.
+   Accepting a javascript: URL here would persist a value the view then
+   silently refuses to render. */
+const isValidUrl = (url) => {
+	try {
+		const { protocol } = new URL(url);
+		return protocol === "http:" || protocol === "https:";
+	} catch {
+		return false;
+	}
+};
+
 function validateListingBody(body) {
-	const { title, description, price, category, condition, seller, location } =
-		body;
+	const {
+		title,
+		description,
+		price,
+		category,
+		condition,
+		imageUrl,
+		seller,
+		location,
+	} = body;
 	const errors = {};
 
 	if (!isValidLength(title, 3, 80)) errors.title = "Tittel må være 3–80 tegn";
 	if (!isValidLength(description, 10, 500))
 		errors.description = "Beskrivelse må være minst 10 tegn";
 	if (!isValidPrice(Number(price)))
-		errors.price = "Prisen må være et positivt tall";
+		errors.price = "Prisen må være et helt tall, 0 eller høyere";
 	if (!CATEGORIES.includes(category)) errors.category = "Ugyldig kategori";
 	if (!CONDITIONS.includes(condition)) errors.condition = "Ugyldig tilstand";
 	if (!seller || !isValidLength(seller.name))
@@ -48,6 +68,7 @@ function validateListingBody(body) {
 		errors.zip = "Postnummer må være 4 sifre";
 	if (!location || !isValidLength(location.city, 2))
 		errors.city = "Sted må være minst 2 tegn";
+	if (imageUrl && !isValidUrl(imageUrl)) errors.imageUrl = "Ugyldig URL";
 
 	return errors;
 }
@@ -75,7 +96,7 @@ const rowToListing = (row) => ({
 
 listingsRouter.get("/", async (_, res) => {
 	const { rows } = await pool.query(
-		"SELECT * FROM listings ORDER BY created_at DESC",
+		"SELECT * FROM listings ORDER BY created_at DESC, id DESC",
 	);
 
 	res.json(rows.map(rowToListing));
