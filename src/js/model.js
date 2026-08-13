@@ -242,8 +242,9 @@ function buildViewState() {
 	}
 
 	async function withActionError(fn) {
+		state.actionError = false;
 		try {
-			await fn();
+			return await fn();
 		} catch {
 			state.actionError = true;
 			notify();
@@ -343,12 +344,21 @@ function buildViewState() {
 		state.form.errors = {};
 	}
 
-	function toggleSold(id){
-		state.listings = state.listings.map(listing =>
-			listing.id === id ? {...listing, sold: !listing.sold} : listing
-		)
-		writeToStorage()
-		notify()
+	async function toggleSold(id) {
+		const listing = state.listings.find((item) => item.id === id);
+		if (!listing) return;
+
+		const updated = { ...listing, sold: !listing.sold };
+
+		await withActionError(async () => {
+			await fetchUpdateListing(id, updated);
+
+			state.listings = state.listings.map((item) =>
+				item.id === id ? updated : item,
+			);
+
+			notify();
+		});
 	}
 
 	/* input comes from FormData, which is always flat. The seller fields are
@@ -384,12 +394,13 @@ function buildViewState() {
 			return;
 		}
 
-		await withActionError(async () => {
+		return await withActionError(async () => {
 			const created = await fetchCreateListing(listing);
 
 			clearFormValues();
 			state.listings = [created, ...state.listings];
 			showDetail(created.id);
+			return created;
 		});
 	}
 

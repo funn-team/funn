@@ -14,31 +14,34 @@ Built by [funn-team](https://github.com/funn-team), five developers-in-training 
 - Mark listings as favourites and filter down to them — favourites survive a refresh
 - Every screen has its own address, so a listing can be refreshed, bookmarked or shared, and the browser's back button works
 
-Everything is kept in `localStorage`. There is no sign-in, no messaging, no bidding and no payment; those were deliberately left out to keep the scope landable.
+Listings live in a Postgres database behind a small API. Favourites are still kept in `localStorage`, since they're per-browser rather than shared data. There is no sign-in, no messaging, no bidding and no payment; those were deliberately left out to keep the scope landable.
 
 ## Stack
 
-Vanilla JavaScript with an MVC structure. No build step, no dependencies. Listings are stored in `localStorage`, seeded from `src/js/seed.js` on first load.
+Vanilla JavaScript with an MVC structure on the frontend, built and served by Vite. The backend is a small Express API backed by a Neon (Postgres) database. Listings are seeded from `data/seed.data.js` via `scripts/seed.js`.
 
 ## Running it
 
-The app uses ES modules, so it needs a local server — opening `index.html` straight from the file system will not work.
+1. `npm install`
+2. Copy `.env.example` to `.env` and fill in `DATABASE_URL` with a Neon connection string (`PORT` defaults to 3000 if left out)
+3. Run `server/db/schema.sql` against that database once (Neon's SQL editor, or `psql "$DATABASE_URL" -f server/db/schema.sql`) to create the `listings` table
+4. `npm run dev:seed` to load the seed listings (this deletes and re-inserts every row, so don't run it against data you want to keep)
+5. `npm run dev` to start the Vite dev server and the Express API together — open the app at the URL Vite prints (typically `http://localhost:5173`). The frontend calls the API directly at `http://localhost:3000/api/listings` (override with `VITE_API_URL`), so CORS on the server has to allow the Vite origin — see `CLIENT_ORIGIN` in `server/index.js` if you run Vite on a non-default port
 
-Pick whichever you have:
-
-- **VS Code** — install the Live Server extension, then right-click `src/index.html` and choose *Open with Live Server*
-- **Node** — `npx --yes serve src`
-- **Python** — `python -m http.server` from inside the `src` folder
+For a production-style run instead: `npm run build` to build the frontend into `dist/`, then `npm start` to serve both the built frontend and the API from a single Express process on `PORT`.
 
 ## Structure
 
 | Layer | File | Responsibility |
 |---|---|---|
 | Model | `src/js/model.js` | All state and data. No DOM, no timers. Announces changes through `subscribe`/`notify`. |
-| Model | `src/js/seed.js` | Starting listings, so the app is never empty. |
+| Model | `src/js/api.js` | `fetch` calls to the backend API. |
+| Model | `data/seed.data.js` | Starting listings, loaded into the database by `scripts/seed.js`. |
 | View | `src/js/view.js` | Routes to the right screen and forwards user actions. Renders no HTML itself. |
 | View | `src/js/screens/*.js` | One file per screen. Each returns HTML as a string. |
 | Controller | `src/js/controller.js` | Behaviour and event handling. Translates one user action into one call into the model. |
+| Backend | `server/index.js` | Express app: API routes, static frontend, catch-all for client-side routes. |
+| Backend | `server/routes/listings.js` | REST endpoints for listings, backed by Postgres. |
 
 The view never calculates anything. The model hands it a finished `viewState` containing the listings already filtered and sorted, the selected listing, the category and condition lists, the favourite ids and any form errors.
 
@@ -51,18 +54,18 @@ The whole screen is redrawn on every change, which has two consequences worth kn
 
 ## Routing
 
-The URL decides which screen is shown. `controller.js` listens for `hashchange`, reads the hash and calls the matching model action.
+The URL decides which screen is shown, using the History API rather than hash fragments. `controller.js` listens for `popstate`, reads `location.pathname` and calls the matching model action. Since these are real paths, not hash fragments, the server has to answer every one of them with `index.html` — see the catch-all route in `server/index.js` — otherwise a refresh or a shared link 404s instead of reaching this router.
 
-| Hash | Screen |
+| Path | Screen |
 |---|---|
-| `#/` | All listings |
-| `#/annonse/<id>` | One listing |
-| `#/ny` | New listing form |
-| `#/rediger/<id>` | Edit an existing listing |
+| `/` | All listings |
+| `/annonse/<id>` | One listing |
+| `/ny` | New listing form |
+| `/rediger/<id>` | Edit an existing listing |
 
 An unknown route falls back to the list, and an id that matches no listing renders "Fant ikke annonsen" rather than an empty screen.
 
-This is the third thing worth knowing before you add a handler: **a handler that changes screen must write a hash, never call `model.showDetail`, `model.showList`, `model.showNew` or `model.showEdit` directly.** Calling the model straight would change the screen while the address bar kept pointing at the old one, and nothing would warn you — the app would look right until someone refreshed. Where the model moves screen by itself, after saving or deleting, the controller rewrites the address with `history.replaceState` so the form or the deleted listing does not stay in the back history.
+This is the third thing worth knowing before you add a handler: **a handler that changes screen must call `navigate` to push a path, never call `model.showDetail`, `model.showList`, `model.showNew` or `model.showEdit` directly.** Calling the model straight would change the screen while the address bar kept pointing at the old one, and nothing would warn you — the app would look right until someone refreshed. Where the model moves screen by itself, after saving or deleting, the controller rewrites the address with `history.replaceState` so the form or the deleted listing does not stay in the back history.
 
 ## Team
 

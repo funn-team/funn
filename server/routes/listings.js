@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { Router } from "express";
+import { CATEGORIES, CONDITIONS } from "#/data/seed.data.js";
 import { pool } from "../db.js";
 
 export const listingsRouter = Router();
@@ -10,6 +11,46 @@ export const listingsRouter = Router();
    instead — they match what was actually stored. */
 const toIsoDate = (date) =>
 	`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+/* Server-side mirror of validateListing in model.js — that one is UX only,
+   this is the actual gate, since the API is reachable directly. Keep the
+   rules in sync; they must not drift. */
+const isValidLength = (text, min = 3, max = 80) =>
+	typeof text === "string" && text.trim().length >= min && text.length <= max;
+const isValidPrice = (price, min = 0, max = 999999) =>
+	Number.isFinite(price) && price >= min && price <= max;
+const isValidEmail = (email) =>
+	typeof email === "string" &&
+	/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
+const isValidPhone = (phone) =>
+	typeof phone === "string" && /^\+?\d{8,}$/.test(phone.replace(/\s/g, ""));
+const isValidZip = (zip) => typeof zip === "string" && /^\d{4}$/.test(zip);
+
+function validateListingBody(body) {
+	const { title, description, price, category, condition, seller, location } =
+		body;
+	const errors = {};
+
+	if (!isValidLength(title, 3, 80)) errors.title = "Tittel må være 3–80 tegn";
+	if (!isValidLength(description, 10, 500))
+		errors.description = "Beskrivelse må være minst 10 tegn";
+	if (!isValidPrice(Number(price)))
+		errors.price = "Prisen må være et positivt tall";
+	if (!CATEGORIES.includes(category)) errors.category = "Ugyldig kategori";
+	if (!CONDITIONS.includes(condition)) errors.condition = "Ugyldig tilstand";
+	if (!seller || !isValidLength(seller.name))
+		errors.sellerName = "Navnet må være minst 3 tegn";
+	if (!seller || !isValidEmail(seller.email))
+		errors.sellerEmail = "Ugyldig e-postadresse";
+	if (!seller || !isValidPhone(seller.phone))
+		errors.sellerPhone = "Telefonnummer må ha minst 8 sifre";
+	if (!location || !isValidZip(location.zip))
+		errors.zip = "Postnummer må være 4 sifre";
+	if (!location || !isValidLength(location.city, 2))
+		errors.city = "Sted må være minst 2 tegn";
+
+	return errors;
+}
 
 const rowToListing = (row) => ({
 	id: row.id,
@@ -62,8 +103,9 @@ listingsRouter.post("/", async (req, res) => {
 		location,
 	} = req.body;
 
-	if (!seller || !location) {
-		return res.status(400).json({ error: "Selger og sted er nødvendig" });
+	const errors = validateListingBody(req.body);
+	if (Object.keys(errors).length > 0) {
+		return res.status(400).json({ error: "Valideringsfeil", errors });
 	}
 
 	const { rows } = await pool.query(
@@ -100,20 +142,22 @@ listingsRouter.patch("/:id", async (req, res) => {
 		category,
 		condition,
 		imageUrl,
+		sold,
 		seller,
 		location,
 	} = req.body;
 
-	if (!seller || !location) {
-		return res.status(400).json({ error: "Selger og sted er nødvendig" });
+	const errors = validateListingBody(req.body);
+	if (Object.keys(errors).length > 0) {
+		return res.status(400).json({ error: "Valideringsfeil", errors });
 	}
 
 	const { rows } = await pool.query(
 		`UPDATE listings SET
 				title = $1, description = $2, price = $3, category = $4, condition = $5,
 				image_url = $6, seller_name = $7, seller_phone = $8, seller_email = $9,
-				city = $10, zip = $11
-		WHERE id = $12
+				city = $10, zip = $11, sold = $12
+		WHERE id = $13
 
 		RETURNING *`,
 
@@ -129,6 +173,7 @@ listingsRouter.patch("/:id", async (req, res) => {
 			seller.email,
 			location.city,
 			location.zip,
+			sold ?? false,
 			req.params.id,
 		],
 	);

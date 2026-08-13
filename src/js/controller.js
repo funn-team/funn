@@ -167,6 +167,7 @@ export function createController({ model, view }) {
 		// First draw comes from the URL, so a refresh or a shared link lands
 		// on the listing it names instead of always on the list.
 		applyRoute();
+		model.start();
 	}
 
 	return { init };
