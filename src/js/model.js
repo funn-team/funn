@@ -28,6 +28,8 @@ export function createModel() {
 		confirmDeleteId: null,
 		favoriteIds: readFavoritesFromStorage(),
 		showOnlyFavorites: false,
+		minPrice: "",
+		maxPrice: "",
 		// options: 'price-asc', 'price-desc', 'date-desc', 'date-asc'
 		sort: "date-desc",
 		form: {
@@ -109,6 +111,8 @@ export function createModel() {
 		category,
 		showOnlyFavorites,
 		favorites,
+		minPrice,
+		maxPrice
 	) {
 		const text = search.trim().toLowerCase();
 		return listings.filter((listing) => {
@@ -117,7 +121,9 @@ export function createModel() {
 			const matchesCategory =
 				category === "all" || listing.category === category;
 			const matchesFavorites = !showOnlyFavorites || favorites.has(listing.id);
-			return matchesText && matchesCategory && matchesFavorites;
+			const matchesMinPrice = minPrice === "" || Number(listing.price) >= Number(minPrice);
+			const matchesMaxPrice = maxPrice === "" || Number(listing.price) <= Number(maxPrice);
+			return matchesText && matchesCategory && matchesFavorites && matchesMinPrice && matchesMaxPrice;
 		});
 	}
 
@@ -146,42 +152,56 @@ export function createModel() {
 		}
 	}
 
-	function buildViewState() {
-		const filtered = filterListings(
-			state.listings,
-			state.search,
-			state.category,
-			state.showOnlyFavorites,
-			state.favoriteIds,
-		);
+function buildViewState() {
+	const categoryCounts = {};
 
-		return {
-			screen: state.screen,
-			search: state.search,
-			category: state.category,
-			sort: state.sort,
+	state.listings.forEach((listing) => {
+		categoryCounts[listing.category] =
+			(categoryCounts[listing.category] || 0) + 1;
+	});
 
-			visibleListings: sortListings(filtered, state.sort),
+	const filtered = filterListings(
+		state.listings,
+		state.search,
+		state.category,
+		state.showOnlyFavorites,
+		state.favoriteIds,
+		state.minPrice,
+		state.maxPrice,
+	);
 
-			totalCount: state.listings.length,
+	return {
+		screen: state.screen,
+		search: state.search,
+		category: state.category,
+		categoryCounts: categoryCounts,
 
-			favoriteIds: [...state.favoriteIds],
-			favoriteCount: state.favoriteIds.size,
-			showOnlyFavorites: state.showOnlyFavorites,
+		visibleListings: sortListings(filtered, state.sort),
 
-			selectedListing:
-				state.listings.find((l) => l.id === state.selectedId) ?? null,
+		totalCount: state.listings.length,
 
-			categories: ["all", ...new Set(state.listings.map((l) => l.category))],
-			conditions: CONDITIONS,
-			confirmDeleteId: state.confirmDeleteId,
+		sort: state.sort,
+		minPrice: state.minPrice,
+		maxPrice: state.maxPrice,
 
-			form: {
-				values: state.form.values,
-				errors: state.form.errors,
-			},
-		};
-	}
+		favoriteIds: [...state.favoriteIds],
+		favoriteCount: state.favoriteIds.size,
+		showOnlyFavorites: state.showOnlyFavorites,
+
+		selectedListing:
+			state.listings.find((l) => l.id === state.selectedId) ?? null,
+
+		categories: ["all", ...new Set(state.listings.map((l) => l.category))],
+		conditions: CONDITIONS,
+		confirmDeleteId: state.confirmDeleteId,
+
+		form: {
+			values: state.form.values,
+			errors: state.form.errors,
+		},
+	};
+}
+
 
 	/* ---------- subscribe / notify -------------------------------------- */
 
@@ -368,6 +388,16 @@ export function createModel() {
 		return listing;
 	}
 
+	function setMinPrice(value) {
+		state.minPrice = value;
+		notify();
+	}
+
+	function setMaxPrice(value) {
+		state.maxPrice = value;
+		notify();
+	}
+
 	function validateListing(listing) {
 		const isValidLength = (text, min = 3, max = 80) =>
 			text.length >= min && text.length <= max;
@@ -426,5 +456,7 @@ export function createModel() {
 		toggleSold,
 		toggleFavorite,
 		toggleFavoritesFilter,
+		setMinPrice,
+		setMaxPrice,
 	};
 }

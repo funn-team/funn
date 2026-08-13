@@ -20,6 +20,9 @@ export function renderListScreen(viewState) {
 		favoriteCount,
 		showOnlyFavorites,
 		sort,
+		minPrice,
+		maxPrice,
+		categoryCounts,
 	} = viewState;
 
 	return `
@@ -37,16 +40,34 @@ export function renderListScreen(viewState) {
 				data-action="search">
 
 			<label class="visually-hidden" for="category-field">Kategori</label>
-			<select id="category-field" class="field" data-action="selectCategory">
-				${categories
-					.map(
-						(name) => `
-					<option value="${escapeHtml(name)}" ${name === category ? "selected" : ""}>
-						${name === "all" ? "Alle kategorier" : escapeHtml(name)}
-					</option>`,
-					)
-					.join("")}
+			<select id="category-field" class="field" data-action="selectCategory"> 
+			${categories .map((name) => { const count = name === "all" 
+				? totalCount : categoryCounts[name] || 0; 
+				return ` <option value="${escapeHtml(name)}" ${name === category ? "selected" : ""}> 
+				${name === "all" ? `Alle kategorier (${count})` : `${escapeHtml(name)} (${count})`} 
+				</option>`; }) .join("")} 
 			</select>
+
+		<div class="search-bar__bottom">
+			<label class="visually-hidden" for="min-price-field">Minimumspris</label>
+			<input
+				id="min-price-field"
+				class="field"
+				type="text"
+				inputmode="numeric"
+				placeholder="Min pris"
+				value="${escapeHtml(minPrice)}"
+				data-action="setMinPrice">
+
+			<label class="visually-hidden" for="max-price-field">Maksimumspris</label>
+			<input
+				id="max-price-field"
+				class="field"
+				type="text"
+				inputmode="numeric"
+				placeholder="Maks pris"
+				value="${escapeHtml(maxPrice)}"
+				data-action="setMaxPrice">
 
 			<label class="visually-hidden" for="sort-field">Sortering</label>
 			<select id="sort-field" class="field field--compact" data-action="setSort">
@@ -55,6 +76,7 @@ export function renderListScreen(viewState) {
 				<option value="price-asc" ${sort === "price-asc" ? "selected" : ""}>Pris: lav → høy</option>
 				<option value="price-desc" ${sort === "price-desc" ? "selected" : ""}>Pris: høy → lav</option>
 			</select>
+		</div>
 
 			<label>
 				<input
@@ -89,38 +111,39 @@ function renderListingGrid(listings, favoriteIds) {
 function renderCard(listing, favoriteIds) {
 	const city = listing.location?.city ?? "";
 	const isFavorite = favoriteIds.includes(listing.id);
-	const isSold = listing.sold
+	const isSold = listing.sold;
 
 	return `
-	<li class="card">
-		<button
-			class="card__favorite"
-			type="button"
-			data-action="toggleFavorite"
-			data-id="${escapeHtml(listing.id)}"
-			aria-pressed="${isFavorite}"
-			aria-label="Favoritt: ${escapeHtml(listing.title)}">
-			${isFavorite ? "★" : "☆"}
-		</button>
+<li class="card">
+	<button
+		class="card__favorite"
+		type="button"
+		data-action="toggleFavorite"
+		data-id="${escapeHtml(listing.id)}"
+		aria-pressed="${isFavorite}"
+		aria-label="Favoritt: ${escapeHtml(listing.title)}">
+		${isFavorite ? "★" : "☆"}
+	</button>
 
-		<button
-			class="card__button"
-			type="button"
-			data-action="showDetail"
-			data-id="${escapeHtml(listing.id)}">
+	<button
+		class="card__button"
+		type="button"
+		data-action="showDetail"
+		data-id="${escapeHtml(listing.id)}">
 
-			${renderThumbnail(listing)}
+		${renderThumbnail(listing)}
 
-			<span class="card__title">${escapeHtml(listing.title)}</span>
-			${isSold ? `<span class="card__sold-badge">Solgt</span>` : ""}
-			<span class="card__price">${formatPrice(listing.price)}</span>
-			<span class="card__meta">
-				${escapeHtml(city)} · ${escapeHtml(listing.category)}
-			</span>
-		</button>
-	</li>
-	`;
+		<span class="card__title">${escapeHtml(listing.title)}</span>
+		${isSold ? `<span class="card__sold-badge">Solgt</span>` : ""}
+		<span class="card__price">${formatPrice(listing.price)}</span>
+		<span class="card__meta">
+			${escapeHtml(city)} · ${escapeHtml(listing.category)}
+		</span>
+	</button>
+</li>
+`;
 }
+
 
 function renderThumbnail(listing) {
 	const url = safeImageUrl(listing.imageUrl);
