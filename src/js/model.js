@@ -395,13 +395,21 @@ export function createModel() {
 		return listing;
 	}
 
+	/* The price fields are type="text", so anything can be typed into them.
+	   Number("1 200") is NaN, and every comparison against NaN is false, so
+	   an unfiltered value would empty the list instead of filtering it.
+	   Stripping to digits means "1 200 kr" narrows to 1200 as you type. */
+	function onlyDigits(value) {
+		return String(value ?? "").replace(/\D/g, "");
+	}
+
 	function setMinPrice(value) {
-		state.minPrice = value;
+		state.minPrice = onlyDigits(value);
 		notify();
 	}
 
 	function setMaxPrice(value) {
-		state.maxPrice = value;
+		state.maxPrice = onlyDigits(value);
 		notify();
 	}
 
