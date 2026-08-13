@@ -1,19 +1,3 @@
-/* ======================================================================
-   src/js/seed.js — SEED DATA
-   The listings the app starts with, so the demo is never empty. After the
-   first load the data lives in localStorage.
-
-   Norwegian text here is content shown to the user, not identifiers.
-
-   The repo is public, so no seller detail may look like it belongs to a
-   real person. Phone numbers run +47 400 00 00X and are obviously
-   sequential; emails use example.com, which RFC 2606 reserves for
-   documentation and can never be registered. Keep both patterns when
-   adding listings.
-
-   Maintainer: see README. Anyone may add more listings.
-   ====================================================================== */
-
 export const CATEGORIES = [
 	"Sport og friluft",
 	"Møbler og interiør",
@@ -33,58 +17,6 @@ export const CONDITIONS = [
 	"Ødelagt / trenger reparasjon",
 ];
 
-const listingExample = {
-	/** @type {string} **/
-	// UUID
-	id: "bd2a38ca-22e9-4c8e-a647-2d6aaf7a837b",
-
-	/** @type {string} **/
-	// Title for the listing
-	title: "Brukt terrengsykkel",
-
-	/** @type {string} **/
-	// Description
-	description: "Lite brukt, ny kjede. Passer høyde 170–185 cm.",
-
-	/** @type {number} **/
-	// Price for the listing
-	price: 3500,
-
-	/** @type {typeof CATEGORIES[number]} **/
-	// Must be one of CATEGORIES
-	category: "Sport og friluft",
-
-	/** @type {string} **/
-	// Image URL
-	imageUrl:
-		"https://images.pexels.com/photos/7614428/pexels-photo-7614428.jpeg",
-
-	/** @type {string} **/
-	// ISO date (YYYY-MM-DD)
-	createdAt: "2026-08-03",
-
-	/** @type {typeof CONDITIONS[number]} **/
-	// Must be one of CONDITIONS
-	condition: "Pent brukt",
-
-	/** @type {{name: string, phone: string, email: string}} **/
-	seller: {
-		name: "Ola Nordmann",
-		phone: "+47 400 00 001",
-		email: "ola.nordmann@example.com",
-	},
-
-	/** @type {{city: string, zip: string}} **/
-	location: {
-		city: "Lillehammer",
-		zip: "2609",
-	},
-
-	/** @type {boolean} **/
-	sold: false,
-};
-
-/** @type {typeof listingExample[]} **/
 export const seedListings = [
 	{
 		id: "bd2a38ca-22e9-4c8e-a647-2d6aaf7a837b",

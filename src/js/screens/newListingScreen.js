@@ -27,6 +27,23 @@ export function renderNewListingScreen(viewState) {
 	const isEdit = viewState.screen === "edit";
 	const listing = viewState.selectedListing;
 
+	if (isEdit && !listing && viewState.loading) {
+		return `
+			<section class="screen">
+				<p class="empty">Laster annonse …</p>
+			</section>
+		`;
+	}
+
+	if (isEdit && !listing) {
+		return `
+			<section class="screen">
+				<p class="empty">Fant ikke annonsen.</p>
+				<button class="button" type="button" data-action="showList">Til alle annonser</button>
+			</section>
+		`;
+	}
+
 	return `
 		<section class="screen">
 			<button class="button button--quiet" type="button" data-action="showList">
@@ -59,14 +76,14 @@ export function renderNewListingScreen(viewState) {
 
 					<div class="form__row">
 						<label for="category">Kategori</label>
-						<select id="category" class="field" name="category">
+						<select id="category" class="field" name="category" data-action="formInput">
 							${categories.map((name) => `<option value="${escapeHtml(name)}" ${name === (values.category ?? (isEdit ? listing.category : "")) ? "selected" : ""}>${escapeHtml(name)}</option>`).join("")}
 						</select>
 					</div>
 
 					<div class="form__row">
 						<label for="condition">Tilstand</label>
-						<select id="condition" class="field" name="condition">
+						<select id="condition" class="field" name="condition" data-action="formInput">
 							${conditions.map((name) => `<option value="${escapeHtml(name)}" ${name === (values.condition ?? (isEdit ? listing.condition : "")) ? "selected" : ""}>${escapeHtml(name)}</option>`).join("")}
 						</select>
 					</div>

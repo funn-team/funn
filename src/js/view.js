@@ -30,6 +30,7 @@ export function createView(rootEl) {
 	if (!output) throw new Error('Missing <main id="main"> inside #app');
 
 	const status = rootEl.querySelector("#status");
+	const actionError = rootEl.querySelector("#action-error");
 
 	// null until the first render, so the first screen does not steal focus
 	// from wherever the user actually is when the page loads.
@@ -44,6 +45,7 @@ export function createView(rootEl) {
 		output.innerHTML = draw(viewState);
 		lastScreen = viewState.screen;
 		announce(viewState);
+		announceActionError(viewState);
 
 		// On a screen change the element that had focus no longer exists, so
 		// restoring it is meaningless — move to the new heading instead.
@@ -51,6 +53,7 @@ export function createView(rootEl) {
 			focusHeading();
 			return;
 		}
+
 		restoreFocus(focus);
 	}
 
@@ -75,6 +78,13 @@ export function createView(rootEl) {
 				: "";
 	}
 
+	function announceActionError(viewState) {
+		if (!actionError) return;
+		actionError.textContent = viewState.actionError
+			? "Noe gikk galt. Prøv igjen."
+			: "";
+	}
+
 	/* The whole screen is redrawn on every change. Without this, the search
 	   field would lose focus on every keystroke. */
 	function readFocus() {
@@ -87,15 +97,38 @@ export function createView(rootEl) {
 		} catch {
 			// Some input types do not support selectionStart. Skip it.
 		}
-		return { action: active.dataset.action, caret };
+		return {
+			action: active.dataset.action,
+			elementId: active.id || null,
+			dataId: active.dataset.id ?? null,
+			caret,
+		};
 	}
 
 	function restoreFocus(focus) {
 		if (!focus) return;
-		const field = output.querySelector(`[data-action="${focus.action}"]`);
+
+		/* The element id comes first because it uniquely identifies a single
+		   form field — every field on the new-listing form carries
+		   data-action="formInput", so matching on the action alone sends
+		   focus to the first one. data-id disambiguates repeated elements
+		   bound to a specific listing, like the toggleFavorite button on
+		   each card, which have no unique element id. */
+		const selector = focus.dataId
+			? `[data-action="${focus.action}"][data-id="${focus.dataId}"]`
+			: `[data-action="${focus.action}"]`;
+
+		const field =
+			(focus.elementId &&
+				output.querySelector(`#${CSS.escape(focus.elementId)}`)) ||
+			output.querySelector(selector);
+
 		if (!field) return;
-		field.focus();
+
+		field.focus({ preventScroll: true });
+
 		if (focus.caret === null) return;
+
 		try {
 			field.setSelectionRange(focus.caret, focus.caret);
 		} catch {
@@ -107,34 +140,34 @@ export function createView(rootEl) {
 	   handlers = { actionName: (event, element) => {} }
 	   Because they sit on #app and not on the content, they survive the
 	   content being replaced on every render. */
-function bindActions(handlers) {
-	rootEl.addEventListener("click", (event) => {
-		const element = event.target.closest("[data-action]");
-		if (!element) return;
+	function bindActions(handlers) {
+		rootEl.addEventListener("click", (event) => {
+			const element = event.target.closest("[data-action]");
+			if (!element) return;
 
-		// Form fields are handled by the input listener below.
-		if (element.matches("input, select, textarea, form")) return;
+			// Form fields are handled by the input listener below.
+			if (element.matches("input, select, textarea, form")) return;
 
-		if (element.tagName === "A") event.preventDefault();
+			if (element.tagName === "A") event.preventDefault();
 
-		handlers[element.dataset.action]?.(event, element);
-	});
+			handlers[element.dataset.action]?.(event, element);
+		});
 
-	rootEl.addEventListener("input", (event) => {
-		const element = event.target.closest("[data-action]");
-		if (!element || !element.matches("input, select, textarea")) return;
+		rootEl.addEventListener("input", (event) => {
+			const element = event.target.closest("[data-action]");
+			if (!element?.matches("input, select, textarea")) return;
 
-		handlers[element.dataset.action]?.(event, element);
-	});
+			handlers[element.dataset.action]?.(event, element);
+		});
 
-	rootEl.addEventListener("submit", (event) => {
-		const form = event.target.closest("form[data-action]");
-		if (!form) return;
+		rootEl.addEventListener("submit", (event) => {
+			const form = event.target.closest("form[data-action]");
+			if (!form) return;
 
-		event.preventDefault();
-		handlers[form.dataset.action]?.(event, form);
-	});
+			event.preventDefault();
+			handlers[form.dataset.action]?.(event, form);
+		});
+	}
+
+	return { render, bindActions };
 }
-
-return { render, bindActions };
-};

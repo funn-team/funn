@@ -1,3 +1,5 @@
+// @ts-check
+
 /* ======================================================================
    src/js/model.js — MODEL
    All state and all data. No DOM, no timers.
@@ -8,9 +10,14 @@
    Maintainer: see README. Anyone may work here — say so first.
    ====================================================================== */
 
-import { CONDITIONS, seedListings } from "./seed.js";
+import { CONDITIONS } from "#/data/seed.data";
+import {
+	fetchCreateListing,
+	fetchDeleteListing,
+	fetchGetListings,
+	fetchUpdateListing,
+} from "./api";
 
-const STORAGE_KEY = "funn:listings";
 const FAVORITES_KEY = "funn:favorites";
 
 /* Fixed list rather than derived from the data, so the form offers the
@@ -20,56 +27,33 @@ export function createModel() {
 	const listeners = new Set();
 
 	const state = {
-		listings: readFromStorage(),
-		screen: "list", // "list" | "detail" | "new"
+		listings: [],
+
+		//options: "list" | "detail" | "new"
+		screen: "list",
+
 		selectedId: null,
 		search: "",
 		category: "all",
+
 		confirmDeleteId: null,
+
 		favoriteIds: readFavoritesFromStorage(),
 		showOnlyFavorites: false,
 		minPrice: "",
 		maxPrice: "",
 		// options: 'price-asc', 'price-desc', 'date-desc', 'date-asc'
 		sort: "date-desc",
+
 		form: {
 			values: {},
 			errors: {},
 		},
+
+		loading: true,
+		loadError: false,
+		actionError: false,
 	};
-
-	/* ---------- storage ------------------------------------------------ */
-
-	function readFromStorage() {
-		try {
-			const stored = localStorage.getItem(STORAGE_KEY);
-			if (!stored) return [...seedListings];
-
-			const parsed = JSON.parse(stored);
-			// Data saved under an older shape is discarded rather than
-			// rendered as undefined. Cheap insurance while the model is
-			// still changing.
-			if (
-				!Array.isArray(parsed) ||
-				parsed.some((listing) => !listing?.seller || !listing?.location)
-			) {
-				return [...seedListings];
-			}
-			return parsed;
-		} catch {
-			// Corrupt or blocked localStorage must not crash the app.
-			return [...seedListings];
-		}
-	}
-
-	function writeToStorage() {
-		try {
-			localStorage.setItem(STORAGE_KEY, JSON.stringify(state.listings));
-		} catch {
-			// Storage full or denied: the app keeps working, the data just
-			// does not survive a refresh. Better than crashing mid-demo.
-		}
-	}
 
 	function readFavoritesFromStorage() {
 		try {
@@ -112,7 +96,7 @@ export function createModel() {
 		showOnlyFavorites,
 		favorites,
 		minPrice,
-		maxPrice
+		maxPrice,
 	) {
 		const text = search.trim().toLowerCase();
 		return listings.filter((listing) => {
@@ -121,9 +105,17 @@ export function createModel() {
 			const matchesCategory =
 				category === "all" || listing.category === category;
 			const matchesFavorites = !showOnlyFavorites || favorites.has(listing.id);
-			const matchesMinPrice = minPrice === "" || Number(listing.price) >= Number(minPrice);
-			const matchesMaxPrice = maxPrice === "" || Number(listing.price) <= Number(maxPrice);
-			return matchesText && matchesCategory && matchesFavorites && matchesMinPrice && matchesMaxPrice;
+			const matchesMinPrice =
+				minPrice === "" || Number(listing.price) >= Number(minPrice);
+			const matchesMaxPrice =
+				maxPrice === "" || Number(listing.price) <= Number(maxPrice);
+			return (
+				matchesText &&
+				matchesCategory &&
+				matchesFavorites &&
+				matchesMinPrice &&
+				matchesMaxPrice
+			);
 		});
 	}
 
@@ -144,7 +136,6 @@ export function createModel() {
 				return copy.sort((a, b) =>
 					(a.createdAt || "").localeCompare(b.createdAt || ""),
 				);
-			case "date-desc":
 			default:
 				return copy.sort((a, b) =>
 					(b.createdAt || "").localeCompare(a.createdAt || ""),
@@ -152,56 +143,59 @@ export function createModel() {
 		}
 	}
 
-function buildViewState() {
-	const categoryCounts = {};
+	function buildViewState() {
+		const categoryCounts = {};
 
-	state.listings.forEach((listing) => {
-		categoryCounts[listing.category] =
-			(categoryCounts[listing.category] || 0) + 1;
-	});
+		state.listings.forEach((listing) => {
+			categoryCounts[listing.category] =
+				(categoryCounts[listing.category] || 0) + 1;
+		});
 
-	const filtered = filterListings(
-		state.listings,
-		state.search,
-		state.category,
-		state.showOnlyFavorites,
-		state.favoriteIds,
-		state.minPrice,
-		state.maxPrice,
-	);
+		const filtered = filterListings(
+			state.listings,
+			state.search,
+			state.category,
+			state.showOnlyFavorites,
+			state.favoriteIds,
+			state.minPrice,
+			state.maxPrice,
+		);
 
-	return {
-		screen: state.screen,
-		search: state.search,
-		category: state.category,
-		categoryCounts: categoryCounts,
+		return {
+			screen: state.screen,
+			search: state.search,
+			category: state.category,
+			categoryCounts: categoryCounts,
 
-		visibleListings: sortListings(filtered, state.sort),
+			visibleListings: sortListings(filtered, state.sort),
 
-		totalCount: state.listings.length,
+			totalCount: state.listings.length,
 
-		sort: state.sort,
-		minPrice: state.minPrice,
-		maxPrice: state.maxPrice,
+			sort: state.sort,
+			minPrice: state.minPrice,
+			maxPrice: state.maxPrice,
 
-		favoriteIds: [...state.favoriteIds],
-		favoriteCount: state.favoriteIds.size,
-		showOnlyFavorites: state.showOnlyFavorites,
+			favoriteIds: [...state.favoriteIds],
+			favoriteCount: state.favoriteIds.size,
+			showOnlyFavorites: state.showOnlyFavorites,
 
-		selectedListing:
-			state.listings.find((l) => l.id === state.selectedId) ?? null,
+			selectedListing:
+				state.listings.find((l) => l.id === state.selectedId) ?? null,
 
-		categories: ["all", ...new Set(state.listings.map((l) => l.category))],
-		conditions: CONDITIONS,
-		confirmDeleteId: state.confirmDeleteId,
+			categories: ["all", ...new Set(state.listings.map((l) => l.category))],
+			conditions: CONDITIONS,
+			confirmDeleteId: state.confirmDeleteId,
 
-		form: {
-			values: state.form.values,
-			errors: state.form.errors,
-		},
-	};
-}
+			form: {
+				values: state.form.values,
+				errors: state.form.errors,
+			},
 
+			loading: state.loading,
+			loadError: state.loadError,
+			actionError: state.actionError,
+		};
+	}
 
 	/* ---------- subscribe / notify -------------------------------------- */
 
@@ -220,23 +214,27 @@ function buildViewState() {
 	function showList() {
 		state.screen = "list";
 		state.selectedId = null;
+		state.actionError = false;
 		notify();
 	}
 
 	function showDetail(id) {
 		state.screen = "detail";
 		state.selectedId = id;
+		state.actionError = false;
 		notify();
 	}
 
 	function showNew() {
 		state.screen = "new";
+		state.actionError = false;
 		notify();
 	}
 
 	function showEdit(id) {
 		state.screen = "edit";
 		state.selectedId = id;
+		state.actionError = false;
 		notify();
 	}
 
@@ -250,48 +248,72 @@ function buildViewState() {
 		notify();
 	}
 
-	function confirmDelete() {
-		state.listings = state.listings.filter(
-			(listing) => listing.id !== state.confirmDeleteId,
-		);
-		writeToStorage();
-		showList();
+	async function withActionError(fn) {
+		state.actionError = false;
+		try {
+			return await fn();
+		} catch (err) {
+			console.error(err);
+			state.actionError = true;
+			notify();
+		}
 	}
 
-	function updateListing(id, input) {
-	const listing = state.listings.find((item) => item.id === id);
-	if (!listing) return;
+	async function confirmDelete() {
+		return await withActionError(async () => {
+			await fetchDeleteListing(state.confirmDeleteId);
 
-	const updated = {
-		...listing,
-		title: input.title,
-		price: Number(input.price),
-		category: input.category,
-		description: input.description,
-		condition: input.condition,
-		imageUrl: input.imageUrl ?? "",
-		seller: {
-			name: input.sellerName,
-			phone: input.sellerPhone,
-			email: input.sellerEmail,
-		},
-		location: { city: input.city, zip: input.zip },
-	};
+			state.listings = state.listings.filter(
+				(listing) => listing.id !== state.confirmDeleteId,
+			);
 
-	const errors = validateListing(updated);
-	if (Object.keys(errors).length > 0) {
-		state.form.errors = errors;
-		notify();
-		return;
+			showList();
+			return true;
+		});
 	}
 
-	state.form.errors = {};
-	state.listings = state.listings.map((item) =>
-		item.id === id ? updated : item,
-	);
-	writeToStorage();
-	showDetail(id);
-	return updated;
+	async function updateListing(id, input) {
+		const listing = state.listings.find((item) => item.id === id);
+		if (!listing) return;
+
+		const updated = {
+			...listing,
+			title: input.title,
+			price: Number(input.price),
+			category: input.category,
+			description: input.description,
+			condition: input.condition,
+			imageUrl: input.imageUrl ?? "",
+			seller: {
+				name: input.sellerName,
+				phone: input.sellerPhone,
+				email: input.sellerEmail,
+			},
+			location: { city: input.city, zip: input.zip },
+		};
+
+		const errors = validateListing(updated);
+		if (Object.keys(errors).length > 0) {
+			state.form.errors = errors;
+			notify();
+			return;
+		}
+
+		return await withActionError(async () => {
+			await fetchUpdateListing(id, updated);
+
+			state.listings = state.listings.map((item) =>
+				item.id === id ? updated : item,
+			);
+
+			// Same as addListing: the draft belongs to the form we are leaving,
+			// and would otherwise pre-fill the next new listing with this one's
+			// values. Cleared only on success, so a failed save leaves the form
+			// as the user left it rather than silently discarding their edits.
+			clearFormValues();
+			showDetail(id);
+			return updated;
+		});
 	}
 
 	function setSearch(text) {
@@ -333,12 +355,21 @@ function buildViewState() {
 		state.form.errors = {};
 	}
 
-	function toggleSold(id){
-		state.listings = state.listings.map(listing =>
-			listing.id === id ? {...listing, sold: !listing.sold} : listing
-		)
-		writeToStorage()
-		notify()
+	async function toggleSold(id) {
+		const listing = state.listings.find((item) => item.id === id);
+		if (!listing) return;
+
+		const updated = { ...listing, sold: !listing.sold };
+
+		await withActionError(async () => {
+			await fetchUpdateListing(id, updated);
+
+			state.listings = state.listings.map((item) =>
+				item.id === id ? updated : item,
+			);
+
+			notify();
+		});
 	}
 
 	/* input comes from FormData, which is always flat. The seller fields are
@@ -346,55 +377,59 @@ function buildViewState() {
 	   are named city and zip. They are assembled into seller and location,
 	   two sibling objects on the listing. Renaming a field in the form means
 	   renaming it here too. */
-	function addListing(input) {
-		const location = {
-			city: input.city,
-			zip: input.zip,
-		};
 
-		const seller = {
-			name: input.sellerName,
-			phone: input.sellerPhone,
-			email: input.sellerEmail,
-		};
-
+	async function addListing(input) {
 		const listing = {
-			id: crypto.randomUUID(),
 			title: input.title,
 			price: Number(input.price),
 			category: input.category,
 			description: input.description,
 			condition: input.condition,
 			imageUrl: input.imageUrl ?? "",
-			createdAt: new Date().toISOString().slice(0, 10),
 			sold: false,
-			seller,
-			location,
+			seller: {
+				name: input.sellerName,
+				phone: input.sellerPhone,
+				email: input.sellerEmail,
+			},
+			location: {
+				city: input.city,
+				zip: input.zip,
+			},
 		};
 
 		const errors = validateListing(listing);
-
 		if (Object.keys(errors).length > 0) {
 			state.form.errors = errors;
 			notify();
 			return;
 		}
 
-		clearFormValues();
+		return await withActionError(async () => {
+			const created = await fetchCreateListing(listing);
 
-		state.listings = [listing, ...state.listings];
-		writeToStorage();
-		showDetail(listing.id);
-		return listing;
+			clearFormValues();
+			state.listings = [created, ...state.listings];
+			showDetail(created.id);
+			return created;
+		});
+	}
+
+	/* The price fields are type="text", so anything can be typed into them.
+	   Number("1 200") is NaN, and every comparison against NaN is false, so
+	   an unfiltered value would empty the list instead of filtering it.
+	   Stripping to digits means "1 200 kr" narrows to 1200 as you type. */
+	function onlyDigits(value) {
+		return String(value ?? "").replace(/\D/g, "");
 	}
 
 	function setMinPrice(value) {
-		state.minPrice = value;
+		state.minPrice = onlyDigits(value);
 		notify();
 	}
 
 	function setMaxPrice(value) {
-		state.maxPrice = value;
+		state.maxPrice = onlyDigits(value);
 		notify();
 	}
 
@@ -403,16 +438,27 @@ function buildViewState() {
 			text.length >= min && text.length <= max;
 
 		const isValidPrice = (price, min = 0, max = 999999) =>
-			Number.isFinite(price) && price >= min && price <= max;
+			Number.isInteger(price) && price >= min && price <= max;
 
 		const isValidEmail = (email) =>
 			/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
-		const isValidPhone = (phone) => /^\+?\d{8,}$/.test(phone.replace(/\s/g, ""));
+		const isValidPhone = (phone) =>
+			/^\+?\d{8,}$/.test(phone.replace(/\s/g, ""));
 
 		const isValidZip = (zip) => /^\d{4}$/.test(zip);
 
-		const isValidUrl = (url) => URL.canParse(url);
+		/* Matches safeImageUrl, which only renders http and https. Accepting a
+		   javascript: URL here would store a value the view then refuses to
+		   show, and the user would never learn why. */
+		const isValidUrl = (url) => {
+			try {
+				const { protocol } = new URL(url);
+				return protocol === "http:" || protocol === "https:";
+			} catch {
+				return false;
+			}
+		};
 
 		const errors = {};
 
@@ -421,10 +467,11 @@ function buildViewState() {
 		if (!isValidLength(listing.description, 10, 500))
 			errors.description = "Beskrivelse må være minst 10 tegn";
 		if (!isValidPrice(Number(listing.price)))
-			errors.price = "Prisen må være et positivt tall";
+			errors.price = "Prisen må være et helt tall, 0 eller høyere";
 		if (!isValidZip(listing.location.zip))
 			errors.zip = "Postnummer må være 4 sifre";
-		if (!isValidLength(listing.location.city))
+		// Two characters, not the default three: Ås and Bø are real places.
+		if (!isValidLength(listing.location.city, 2, 60))
 			errors.city = "Sted må være minst 2 tegn";
 		if (!isValidLength(listing.seller.name))
 			errors.sellerName = "Navnet ditt må være minst 3 tegn";
@@ -438,8 +485,24 @@ function buildViewState() {
 		return errors;
 	}
 
+	// Called once by the controller to draw the first screen.
+	async function start() {
+		notify();
+
+		try {
+			state.listings = await fetchGetListings();
+		} catch {
+			state.loadError = true;
+		} finally {
+			state.loading = false;
+		}
+
+		notify();
+	}
+
 	return {
 		subscribe,
+		start,
 		showList,
 		showDetail,
 		showNew,

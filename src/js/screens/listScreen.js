@@ -23,6 +23,8 @@ export function renderListScreen(viewState) {
 		minPrice,
 		maxPrice,
 		categoryCounts,
+		loading,
+		loadError,
 	} = viewState;
 
 	return `
@@ -41,11 +43,14 @@ export function renderListScreen(viewState) {
 
 			<label class="visually-hidden" for="category-field">Kategori</label>
 			<select id="category-field" class="field" data-action="selectCategory"> 
-			${categories .map((name) => { const count = name === "all" 
-				? totalCount : categoryCounts[name] || 0; 
-				return ` <option value="${escapeHtml(name)}" ${name === category ? "selected" : ""}> 
+			${categories
+				.map((name) => {
+					const count = name === "all" ? totalCount : categoryCounts[name] || 0;
+					return ` <option value="${escapeHtml(name)}" ${name === category ? "selected" : ""}> 
 				${name === "all" ? `Alle kategorier (${count})` : `${escapeHtml(name)} (${count})`} 
-				</option>`; }) .join("")} 
+				</option>`;
+				})
+				.join("")} 
 			</select>
 
 		<div class="search-bar__bottom">
@@ -87,15 +92,26 @@ export function renderListScreen(viewState) {
 			</label>
 		</div>
 
-		<p class="result-count">
-			Viser ${visibleListings.length} av ${totalCount} annonser
-		</p>
+		${
+			!loading && !loadError
+				? `
+			<p class="result-count">
+					Viser ${visibleListings.length} av ${totalCount} annonser
+			</p>
+		`
+				: ""
+		}
 
 		${
-			visibleListings.length === 0
-				? renderEmptyState()
-				: renderListingGrid(visibleListings, favoriteIds)
+			loadError
+				? renderErrorState(loadError)
+				: loading
+					? renderLoadingState()
+					: visibleListings.length === 0
+						? renderEmptyState()
+						: renderListingGrid(visibleListings, favoriteIds)
 		}
+
 	</section>
 	`;
 }
@@ -144,7 +160,6 @@ function renderCard(listing, favoriteIds) {
 `;
 }
 
-
 function renderThumbnail(listing) {
 	const url = safeImageUrl(listing.imageUrl);
 	if (!url)
@@ -157,4 +172,12 @@ function renderThumbnail(listing) {
 
 function renderEmptyState() {
 	return `<p class="empty">Ingen annonser passer søket.</p>`;
+}
+
+function renderLoadingState() {
+	return `<div class="loader"></div>`;
+}
+
+function renderErrorState() {
+	return `<p class="error">Kunne ikke laste annonser. Prøv igjen senere.</p>`;
 }
