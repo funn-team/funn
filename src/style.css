@@ -199,9 +199,13 @@ body {
 	width: 100%;
 }
 
-/* Price inputs */
-.search-bar .price-field {
-	min-width: 0;
+/* Min price, max price and sort share a row. They sit in their own
+   wrapper, so the gap has to be repeated here — the one on .search-bar
+   only applies between its direct children. */
+.search-bar__bottom {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: var(--space-1);
 }
 
 /* Favorites checkbox */
@@ -254,26 +258,13 @@ body {
 		width: 100%;
 	}
 
-	/*
-	 * Bottom row:
-	 * date + min + max together occupy the left column.
-	 */
-	.search-bar #sort-field {
+	/* Bottom row: min price, max price and sort share the left column.
+	   The wrapper is the grid item — placing #sort-field directly would do
+	   nothing, since grid placement only applies to direct children. */
+	.search-bar__bottom {
 		grid-column: 1;
 		grid-row: 2;
-		width: 100%;
-	}
-
-	.search-bar .price-field {
-		width: 100%;
-	}
-
-	/*
-	 * Make the three bottom controls share the left side evenly.
-	 */
-	.search-bar #sort-field,
-	.search-bar .price-field {
-		min-width: 0;
+		grid-template-columns: 1fr 1fr 1fr;
 	}
 }
 
