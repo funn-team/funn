@@ -99,7 +99,8 @@ export function createView(rootEl) {
 		}
 		return {
 			action: active.dataset.action,
-			id: active.dataset.id ?? null,
+			elementId: active.id || null,
+			dataId: active.dataset.id ?? null,
 			caret,
 		};
 	}
@@ -107,11 +108,20 @@ export function createView(rootEl) {
 	function restoreFocus(focus) {
 		if (!focus) return;
 
-		const selector = focus.id
-			? `[data-action="${focus.action}"][data-id="${focus.id}"]`
+		/* The element id comes first because it uniquely identifies a single
+		   form field — every field on the new-listing form carries
+		   data-action="formInput", so matching on the action alone sends
+		   focus to the first one. data-id disambiguates repeated elements
+		   bound to a specific listing, like the toggleFavorite button on
+		   each card, which have no unique element id. */
+		const selector = focus.dataId
+			? `[data-action="${focus.action}"][data-id="${focus.dataId}"]`
 			: `[data-action="${focus.action}"]`;
 
-		const field = output.querySelector(selector);
+		const field =
+			(focus.elementId &&
+				output.querySelector(`#${CSS.escape(focus.elementId)}`)) ||
+			output.querySelector(selector);
 
 		if (!field) return;
 
