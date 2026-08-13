@@ -112,7 +112,7 @@ export function createModel() {
 		showOnlyFavorites,
 		favorites,
 		minPrice,
-		maxPrice
+		maxPrice,
 	) {
 		const text = search.trim().toLowerCase();
 		return listings.filter((listing) => {
@@ -121,9 +121,17 @@ export function createModel() {
 			const matchesCategory =
 				category === "all" || listing.category === category;
 			const matchesFavorites = !showOnlyFavorites || favorites.has(listing.id);
-			const matchesMinPrice = minPrice === "" || Number(listing.price) >= Number(minPrice);
-			const matchesMaxPrice = maxPrice === "" || Number(listing.price) <= Number(maxPrice);
-			return matchesText && matchesCategory && matchesFavorites && matchesMinPrice && matchesMaxPrice;
+			const matchesMinPrice =
+				minPrice === "" || Number(listing.price) >= Number(minPrice);
+			const matchesMaxPrice =
+				maxPrice === "" || Number(listing.price) <= Number(maxPrice);
+			return (
+				matchesText &&
+				matchesCategory &&
+				matchesFavorites &&
+				matchesMinPrice &&
+				matchesMaxPrice
+			);
 		});
 	}
 
@@ -152,56 +160,55 @@ export function createModel() {
 		}
 	}
 
-function buildViewState() {
-	const categoryCounts = {};
+	function buildViewState() {
+		const categoryCounts = {};
 
-	state.listings.forEach((listing) => {
-		categoryCounts[listing.category] =
-			(categoryCounts[listing.category] || 0) + 1;
-	});
+		state.listings.forEach((listing) => {
+			categoryCounts[listing.category] =
+				(categoryCounts[listing.category] || 0) + 1;
+		});
 
-	const filtered = filterListings(
-		state.listings,
-		state.search,
-		state.category,
-		state.showOnlyFavorites,
-		state.favoriteIds,
-		state.minPrice,
-		state.maxPrice,
-	);
+		const filtered = filterListings(
+			state.listings,
+			state.search,
+			state.category,
+			state.showOnlyFavorites,
+			state.favoriteIds,
+			state.minPrice,
+			state.maxPrice,
+		);
 
-	return {
-		screen: state.screen,
-		search: state.search,
-		category: state.category,
-		categoryCounts: categoryCounts,
+		return {
+			screen: state.screen,
+			search: state.search,
+			category: state.category,
+			categoryCounts: categoryCounts,
 
-		visibleListings: sortListings(filtered, state.sort),
+			visibleListings: sortListings(filtered, state.sort),
 
-		totalCount: state.listings.length,
+			totalCount: state.listings.length,
 
-		sort: state.sort,
-		minPrice: state.minPrice,
-		maxPrice: state.maxPrice,
+			sort: state.sort,
+			minPrice: state.minPrice,
+			maxPrice: state.maxPrice,
 
-		favoriteIds: [...state.favoriteIds],
-		favoriteCount: state.favoriteIds.size,
-		showOnlyFavorites: state.showOnlyFavorites,
+			favoriteIds: [...state.favoriteIds],
+			favoriteCount: state.favoriteIds.size,
+			showOnlyFavorites: state.showOnlyFavorites,
 
-		selectedListing:
-			state.listings.find((l) => l.id === state.selectedId) ?? null,
+			selectedListing:
+				state.listings.find((l) => l.id === state.selectedId) ?? null,
 
-		categories: ["all", ...new Set(state.listings.map((l) => l.category))],
-		conditions: CONDITIONS,
-		confirmDeleteId: state.confirmDeleteId,
+			categories: ["all", ...new Set(state.listings.map((l) => l.category))],
+			conditions: CONDITIONS,
+			confirmDeleteId: state.confirmDeleteId,
 
-		form: {
-			values: state.form.values,
-			errors: state.form.errors,
-		},
-	};
-}
-
+			form: {
+				values: state.form.values,
+				errors: state.form.errors,
+			},
+		};
+	}
 
 	/* ---------- subscribe / notify -------------------------------------- */
 
@@ -259,39 +266,39 @@ function buildViewState() {
 	}
 
 	function updateListing(id, input) {
-	const listing = state.listings.find((item) => item.id === id);
-	if (!listing) return;
+		const listing = state.listings.find((item) => item.id === id);
+		if (!listing) return;
 
-	const updated = {
-		...listing,
-		title: input.title,
-		price: Number(input.price),
-		category: input.category,
-		description: input.description,
-		condition: input.condition,
-		imageUrl: input.imageUrl ?? "",
-		seller: {
-			name: input.sellerName,
-			phone: input.sellerPhone,
-			email: input.sellerEmail,
-		},
-		location: { city: input.city, zip: input.zip },
-	};
+		const updated = {
+			...listing,
+			title: input.title,
+			price: Number(input.price),
+			category: input.category,
+			description: input.description,
+			condition: input.condition,
+			imageUrl: input.imageUrl ?? "",
+			seller: {
+				name: input.sellerName,
+				phone: input.sellerPhone,
+				email: input.sellerEmail,
+			},
+			location: { city: input.city, zip: input.zip },
+		};
 
-	const errors = validateListing(updated);
-	if (Object.keys(errors).length > 0) {
-		state.form.errors = errors;
-		notify();
-		return;
-	}
+		const errors = validateListing(updated);
+		if (Object.keys(errors).length > 0) {
+			state.form.errors = errors;
+			notify();
+			return;
+		}
 
-	state.form.errors = {};
-	state.listings = state.listings.map((item) =>
-		item.id === id ? updated : item,
-	);
-	writeToStorage();
-	showDetail(id);
-	return updated;
+		state.form.errors = {};
+		state.listings = state.listings.map((item) =>
+			item.id === id ? updated : item,
+		);
+		writeToStorage();
+		showDetail(id);
+		return updated;
 	}
 
 	function setSearch(text) {
@@ -333,12 +340,12 @@ function buildViewState() {
 		state.form.errors = {};
 	}
 
-	function toggleSold(id){
-		state.listings = state.listings.map(listing =>
-			listing.id === id ? {...listing, sold: !listing.sold} : listing
-		)
-		writeToStorage()
-		notify()
+	function toggleSold(id) {
+		state.listings = state.listings.map((listing) =>
+			listing.id === id ? { ...listing, sold: !listing.sold } : listing,
+		);
+		writeToStorage();
+		notify();
 	}
 
 	/* input comes from FormData, which is always flat. The seller fields are
@@ -408,7 +415,8 @@ function buildViewState() {
 		const isValidEmail = (email) =>
 			/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
-		const isValidPhone = (phone) => /^\+?\d{8,}$/.test(phone.replace(/\s/g, ""));
+		const isValidPhone = (phone) =>
+			/^\+?\d{8,}$/.test(phone.replace(/\s/g, ""));
 
 		const isValidZip = (zip) => /^\d{4}$/.test(zip);
 
