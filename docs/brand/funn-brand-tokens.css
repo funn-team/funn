@@ -1,0 +1,19 @@
+:root {
+	--funn-bg: #0d1117;
+	--funn-surface: #161b22;
+	--funn-text: #f0f3f6;
+	--funn-text-muted: #8b949e;
+
+	--funn-blue: #2f81f7;
+	--funn-cyan: #22d3ee;
+	--funn-violet: #8b5cf6;
+	--funn-pink: #d946ef;
+
+	--funn-gradient: linear-gradient(
+		135deg,
+		#22d3ee 0%,
+		#2f81f7 45%,
+		#8b5cf6 78%,
+		#d946ef 100%
+	);
+}

@@ -1,0 +1,18 @@
+{
+	"brand": "Funn",
+	"colors": {
+		"background": "#0D1117",
+		"surface": "#161B22",
+		"text": "#F0F3F6",
+		"textMuted": "#8B949E",
+		"blue": "#2F81F7",
+		"cyan": "#22D3EE",
+		"violet": "#8B5CF6",
+		"pink": "#D946EF"
+	},
+	"gradient": ["#22D3EE", "#2F81F7", "#8B5CF6", "#D946EF"],
+	"typography": {
+		"preferred": "Inter",
+		"fallback": "ui-sans-serif, system-ui, sans-serif"
+	}
+}

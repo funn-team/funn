@@ -1,3 +1,5 @@
+![Funn — Find it. List it. Funn.](docs/brand/funn-readme-header.png)
+
 # Funn
 
 A small marketplace app: post an item for sale, browse the listings, and open one for details.
@@ -73,7 +75,12 @@ This is the third thing worth knowing before you add a handler: **a handler that
 
 ## Team
 
+<img src="docs/brand/funn-org-avatar.png" alt="" width="72" align="left" hspace="16" vspace="4">
+
 The repository belongs to the [funn-team](https://github.com/funn-team) organization. Every member is an owner with equal access and an equal say.
+
+<br clear="left">
+
 
 - Kristian ([@CozREV](https://github.com/CozREV))
 - Rune Smedhaugen ([@RuneSmedhaugen](https://github.com/RuneSmedhaugen))
@@ -114,6 +121,24 @@ The REST API on Neon Postgres, with Express and Vite, was built on a separate br
 - One branch and one pull request per card on the board.
 
 The design document is in [docs/2026-08-06-funn-design.md](docs/2026-08-06-funn-design.md).
+
+## Brand
+
+Logos, icons, colours and usage rules live in [docs/brand](docs/brand) —
+start with [BRAND_GUIDELINES.md](docs/brand/BRAND_GUIDELINES.md).
+
+The palette in `docs/brand/funn-brand-tokens.css` is the source of truth for
+the `:root` block at the top of `src/style.css`. Change it there first, then
+mirror it into the stylesheet; nothing syncs the two automatically.
+
+Blue (`#2F81F7`) is the product colour: buttons, prices, links and focus
+rings. Cyan, violet and pink exist only for the brand gradient, which is
+decorative — it appears once, as the line under the top bar, and never
+behind text. Violet in particular measures 4.47:1 against the background,
+just under the 4.5:1 that body text needs.
+
+The app ships no font files. Inter is first in the stack and is used where
+it is installed; everywhere else `system-ui` takes over.
 
 ## License
 
