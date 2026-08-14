@@ -104,7 +104,7 @@ export function renderListScreen(viewState) {
 
 		${
 			loadError
-				? renderErrorState(loadError)
+				? renderErrorState()
 				: loading
 					? renderLoadingState()
 					: visibleListings.length === 0

@@ -1,4 +1,4 @@
-# funn
+# Funn
 
 A small marketplace app: post an item for sale, browse the listings, and open one for details.
 
