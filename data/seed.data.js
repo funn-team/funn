@@ -31,7 +31,7 @@ export const seedListings = [
 		sold: false,
 		seller: {
 			name: "Ola Nordmann",
-			phone: "+47 400 00 001",
+			phone: "400 00 001",
 			email: "ola.nordmann@example.com",
 		},
 		location: {
@@ -52,7 +52,7 @@ export const seedListings = [
 		sold: false,
 		seller: {
 			name: "Kari Haugen",
-			phone: "+47 400 00 002",
+			phone: "400 00 002",
 			email: "kari.haugen@example.com",
 		},
 		location: {
@@ -73,7 +73,7 @@ export const seedListings = [
 		sold: false,
 		seller: {
 			name: "Per Solberg",
-			phone: "+47 400 00 003",
+			phone: "400 00 003",
 			email: "per.solberg@example.com",
 		},
 		location: {
@@ -94,7 +94,7 @@ export const seedListings = [
 		sold: false,
 		seller: {
 			name: "Mona Iversen",
-			phone: "+47 400 00 004",
+			phone: "400 00 004",
 			email: "mona.iversen@example.com",
 		},
 		location: {
@@ -115,7 +115,7 @@ export const seedListings = [
 		sold: false,
 		seller: {
 			name: "Erik Fjeld",
-			phone: "+47 400 00 005",
+			phone: "400 00 005",
 			email: "erik.fjeld@example.com",
 		},
 		location: {
@@ -136,7 +136,7 @@ export const seedListings = [
 		sold: true,
 		seller: {
 			name: "Silje Berg",
-			phone: "+47 400 00 006",
+			phone: "400 00 006",
 			email: "silje.berg@example.com",
 		},
 		location: {
@@ -157,7 +157,7 @@ export const seedListings = [
 		sold: false,
 		seller: {
 			name: "Jonas Lien",
-			phone: "+47 400 00 007",
+			phone: "400 00 007",
 			email: "jonas.lien@example.com",
 		},
 		location: {
@@ -178,7 +178,7 @@ export const seedListings = [
 		sold: false,
 		seller: {
 			name: "Ingrid Moen",
-			phone: "+47 400 00 008",
+			phone: "400 00 008",
 			email: "ingrid.moen@example.com",
 		},
 		location: {
@@ -199,7 +199,7 @@ export const seedListings = [
 		sold: false,
 		seller: {
 			name: "Hanne Dahl",
-			phone: "+47 400 00 009",
+			phone: "400 00 009",
 			email: "hanne.dahl@example.com",
 		},
 		location: {
@@ -220,7 +220,7 @@ export const seedListings = [
 		sold: false,
 		seller: {
 			name: "Trond Aasen",
-			phone: "+47 400 00 010",
+			phone: "400 00 010",
 			email: "trond.aasen@example.com",
 		},
 		location: {
@@ -241,7 +241,7 @@ export const seedListings = [
 		sold: false,
 		seller: {
 			name: "Camilla Rud",
-			phone: "+47 400 00 011",
+			phone: "400 00 011",
 			email: "camilla.rud@example.com",
 		},
 		location: {
@@ -262,7 +262,7 @@ export const seedListings = [
 		sold: true,
 		seller: {
 			name: "Marius Strand",
-			phone: "+47 400 00 012",
+			phone: "400 00 012",
 			email: "marius.strand@example.com",
 		},
 		location: {
