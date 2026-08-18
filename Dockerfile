@@ -14,5 +14,6 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --prod
 COPY --from=build /app/dist ./dist
 COPY server ./server
+COPY data ./data
 EXPOSE 3000
 CMD ["node", "server/index.js"]

@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { Router } from "express";
-import { CATEGORIES, CONDITIONS } from "#/data/seed.data.js";
+import { CATEGORIES, CONDITIONS } from "../../data/seed.data.js";
 import { pool } from "../db.js";
 
 export const listingsRouter = Router();
