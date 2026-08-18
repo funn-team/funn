@@ -10,7 +10,7 @@
 Thumbs.db
 desktop.ini
 
-# Node (om vi legger til verktøy senere)
+# Node
 node_modules/
 .env
 dist/

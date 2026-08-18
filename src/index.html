@@ -4,6 +4,19 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Funn</title>
+		<meta name="description" content="Funn — legg ut det du vil selge, bla gjennom annonsene, og åpne én for detaljer.">
+
+		<!-- The SVG mark scales to any tab size; the PNGs are the fallback for
+		     browsers that still refuse SVG favicons. -->
+		<link rel="icon" href="/funn-mark.svg" type="image/svg+xml">
+		<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+		<link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+		<!-- Matches --bg in style.css. Tints the browser chrome on Android and
+		     the title bar of an installed window. -->
+		<meta name="theme-color" content="#0D1117">
+
 		<link href="./style.css" rel="stylesheet">
 	</head>
 	<body>
@@ -15,7 +28,14 @@
 		     (see view.js). Screens are rendered into #main. -->
 		<div id="app">
 			<header class="topbar">
-				<a class="logo" href="/" data-action="showList">Funn</a>
+				<!-- The mark is decorative: alt="" keeps a screen reader from
+				     reading the logo twice, since the word "Funn" follows it as
+				     real text. Clicks on the image still reach the anchor's
+				     data-action, because bindActions uses closest(). -->
+				<a class="logo" href="/" data-action="showList">
+					<img class="logo__mark" src="/funn-mark.svg" alt="" width="28" height="28">
+					<span class="logo__word">Funn</span>
+				</a>
 				<button class="button button--primary" type="button" data-action="showNew">
 					Ny annonse
 				</button>

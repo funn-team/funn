@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="700" viewBox="0 0 700 700">
+<rect width="700" height="700" rx="28" fill="#0D1117"/>
+<g transform="translate(273.0,56.0) scale(1.000000)">
+
+
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#22D3EE"/>
+            <stop offset="55%" stop-color="#2F81F7"/>
+            <stop offset="100%" stop-color="#8B5CF6"/>
+          </linearGradient>
+          <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#2F81F7"/>
+            <stop offset="55%" stop-color="#8B5CF6"/>
+            <stop offset="100%" stop-color="#D946EF"/>
+          </linearGradient>
+        </defs>
+        
+
+<path d="M 30.8 29.3 H 123.2 C 117.0 47.7, 106.3 57.0, 86.2 57.0 H 55.4 C 41.6 57.0, 30.8 67.8, 30.8 81.6 Z" fill="url(#g1)"/>
+<path d="M 30.8 66.2 H 98.6 C 92.4 84.7, 81.6 93.9, 63.1 93.9 H 50.8 C 40.0 93.9, 30.8 103.2, 30.8 114.0 V 124.7 C 46.2 121.7, 55.4 114.0, 61.6 98.6 Z" fill="url(#g2)"/>
+
+</g>
+<text x="350.0" y="518.0" fill="#F0F3F6" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="154.0" font-weight="750" letter-spacing="-2" text-anchor="middle">Funn</text>
+</svg>

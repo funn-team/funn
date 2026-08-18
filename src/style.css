@@ -8,15 +8,35 @@
 
 /* ---------- tokens ------------------------------------------------- */
 
+/* The palette comes from the Funn brand pack — see docs/brand/. Change a
+   colour there first, then here; the brand pack is the source of truth.
+   --surface-hover and --border are the two values the pack does not
+   define, placed on the same ladder between --surface and --text-muted. */
+
 :root {
-	--bg: #12151a;
-	--surface: #1b1f26;
-	--surface-hover: #232833;
-	--border: #2c323d;
-	--text: #e6e9ee;
-	--text-muted: #9aa4b2;
-	--accent: #4c9aff;
-	--accent-text: #0b1220;
+	--bg: #0d1117;
+	--surface: #161b22;
+	--surface-hover: #21262d;
+	--border: #30363d;
+	--text: #f0f3f6;
+	--text-muted: #8b949e;
+	--accent: #2f81f7;
+	--accent-text: #0d1117;
+
+	/* Brand support colours. Decorative only — cyan, violet and pink are
+	   for the gradient, never for text or a state a user has to read.
+	   Violet on --bg lands at 4.47:1, under the 4.5:1 needed for body
+	   text, which is the whole reason for that rule. */
+	--brand-cyan: #22d3ee;
+	--brand-violet: #8b5cf6;
+	--brand-pink: #d946ef;
+	--brand-gradient: linear-gradient(
+		135deg,
+		#22d3ee 0%,
+		#2f81f7 45%,
+		#8b5cf6 78%,
+		#d946ef 100%
+	);
 
 	--success: #4cd97a;
 	--success-text: #08210f;
@@ -44,7 +64,11 @@ body {
 	margin: 0;
 	background: var(--bg);
 	color: var(--text);
-	font-family: system-ui, sans-serif;
+	/* Inter is the brand typeface. It is listed first so it is used where
+	   it happens to be installed, but no font file is shipped or fetched —
+	   a webfont would cost a network round trip and a third-party request
+	   for a difference this small. system-ui carries the rest. */
+	font-family: Inter, ui-sans-serif, system-ui, sans-serif;
 	line-height: 1.5;
 }
 
@@ -100,13 +124,14 @@ body {
 }
 
 .error {
-	color: #b00020;
+	color: var(--error);
 	font-weight: 600;
 }
 
 /* ---------- topbar --------------------------------------------------- */
 
 .topbar {
+	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -115,12 +140,36 @@ body {
 	border-bottom: 1px solid var(--border);
 }
 
+/* The one place the brand gradient appears in the app. Decorative, so it
+   carries no meaning a screen reader would need and nothing is written on
+   top of it. */
+.topbar::after {
+	content: "";
+	position: absolute;
+	right: 0;
+	bottom: -1px;
+	left: 0;
+	height: 2px;
+	background: var(--brand-gradient);
+}
+
 .logo {
+	display: flex;
+	align-items: center;
+	gap: 0.55rem;
 	color: var(--text);
 	font-size: 1.25rem;
 	font-weight: 700;
 	letter-spacing: -0.02em;
 	text-decoration: none;
+}
+
+/* Sized in em so the mark tracks the wordmark if the font size changes.
+   The brand pack sets 32px as the floor for the standalone mark; next to
+   the wordmark it reads fine smaller. */
+.logo__mark {
+	width: 1.5em;
+	height: 1.5em;
 }
 
 /* ---------- screen --------------------------------------------------- */
@@ -479,7 +528,7 @@ body {
 	padding: 8px;
 	aspect-ratio: 1;
 	border-radius: 50%;
-	background: #25b09b;
+	background: var(--accent);
 	--_m: conic-gradient(#0000 10%, #000), linear-gradient(#000 0 0) content-box;
 	-webkit-mask: var(--_m);
 	mask: var(--_m);
