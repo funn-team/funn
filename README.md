@@ -1,4 +1,4 @@
-![Funn — Find it. List it. Funn.](docs/brand/funn-readme-header.png)
+![Funn. Find it. List it. Funn.](docs/brand/funn-readme-header.png)
 
 # Funn
 
@@ -8,14 +8,14 @@ Built by [funn-team](https://github.com/funn-team), five developers-in-training 
 
 ## Features
 
-- Browse all listings, with search by title and filter by category — each category shows how many listings it holds
+- Browse all listings, with search by title and filter by category (each category shows how many listings it holds)
 - Narrow the list to a price range
 - Sort by price or date, ascending or descending
 - Open a listing for full details and seller contact information
 - Post a new listing, with validation on every field
 - Edit or delete a listing
 - Mark a listing as sold; it stays visible with a *Solgt* badge rather than disappearing
-- Mark listings as favourites and filter down to them — favourites survive a refresh
+- Mark listings as favourites and filter down to them (favourites survive a refresh)
 - Every screen has its own address, so a listing can be refreshed, bookmarked or shared, and the browser's back button works
 
 All five filters compose: a search, a category, a price range, a sort order and the favourites toggle apply at the same time.
@@ -32,7 +32,7 @@ Vanilla JavaScript with an MVC structure on the frontend, built and served by Vi
 2. Copy `.env.example` to `.env` and fill in `DATABASE_URL` with a Neon connection string (`PORT` defaults to 3000 if left out)
 3. Run `server/db/schema.sql` against that database once (Neon's SQL editor, or `psql "$DATABASE_URL" -f server/db/schema.sql`) to create the `listings` table
 4. `npm run dev:seed` to load the seed listings (this deletes and re-inserts every row, so don't run it against data you want to keep)
-5. `npm run dev` to start the Vite dev server and the Express API together — open the app at the URL Vite prints (typically `http://localhost:5173`). The frontend calls the API directly at `http://localhost:3000/api/listings` (override with `VITE_API_URL`), so CORS on the server has to allow the Vite origin — see `CLIENT_ORIGIN` in `server/index.js` if you run Vite on a non-default port
+5. `npm run dev` to start the Vite dev server and the Express API together. Open the app at the URL Vite prints (typically `http://localhost:5173`). The frontend calls the API directly at `http://localhost:3000/api/listings` (override with `VITE_API_URL`), so CORS on the server has to allow the Vite origin. See `CLIENT_ORIGIN` in `server/index.js` if you run Vite on a non-default port
 
 For a production-style run instead: `npm run build` to build the frontend into `dist/`, then `npm start` to serve both the built frontend and the API from a single Express process on `PORT`.
 
@@ -60,7 +60,7 @@ The whole screen is redrawn on every change, which has two consequences worth kn
 
 ## Routing
 
-The URL decides which screen is shown, using the History API rather than hash fragments. `controller.js` listens for `popstate`, reads `location.pathname` and calls the matching model action. Since these are real paths, not hash fragments, the server has to answer every one of them with `index.html` — see the catch-all route in `server/index.js` — otherwise a refresh or a shared link 404s instead of reaching this router.
+The URL decides which screen is shown, using the History API rather than hash fragments. `controller.js` listens for `popstate`, reads `location.pathname` and calls the matching model action. Since these are real paths, not hash fragments, the server has to answer every one of them with `index.html` (see the catch-all route in `server/index.js`). Otherwise a refresh or a shared link 404s instead of reaching this router.
 
 | Path | Screen |
 |---|---|
@@ -71,7 +71,7 @@ The URL decides which screen is shown, using the History API rather than hash fr
 
 An unknown route falls back to the list, and an id that matches no listing renders "Fant ikke annonsen" rather than an empty screen.
 
-This is the third thing worth knowing before you add a handler: **a handler that changes screen must call `navigate` to push a path, never call `model.showDetail`, `model.showList`, `model.showNew` or `model.showEdit` directly.** Calling the model straight would change the screen while the address bar kept pointing at the old one, and nothing would warn you — the app would look right until someone refreshed. Where the model moves screen by itself, after saving or deleting, the controller rewrites the address with `history.replaceState` so the form or the deleted listing does not stay in the back history.
+This is the third thing worth knowing before you add a handler: **a handler that changes screen must call `navigate` to push a path, never call `model.showDetail`, `model.showList`, `model.showNew` or `model.showEdit` directly.** Calling the model straight would change the screen while the address bar kept pointing at the old one, and nothing would warn you. The app would look right until someone refreshed. Where the model moves screen by itself, after saving or deleting, the controller rewrites the address with `history.replaceState` so the form or the deleted listing does not stay in the back history.
 
 ## Team
 
@@ -106,15 +106,15 @@ The work was split into vertical slices rather than by layer, so everyone wrote 
 
 Search and category filter were built as part of the walking skeleton before the slices were handed out.
 
-The REST API on Neon Postgres, with Express and Vite, was built on a separate branch and rebased onto `main` once it was verified end to end — see the Stack and Running It sections above.
+The REST API on Neon Postgres, with Express and Vite, was built on a separate branch and rebased onto `main` once it was verified end to end. See the Stack and Running It sections above.
 
-`model.js` and `controller.js` are shared by every slice. Merge to `main` the same day you finish a layer, and pull `main` before starting the next one — that is what keeps the conflicts small.
+`model.js` and `controller.js` are shared by every slice. Merge to `main` the same day you finish a layer, and pull `main` before starting the next one. That is what keeps the conflicts small.
 
 ## Conventions
 
-- **All code is English** — function names, variables, data fields, file names, CSS classes, `data-action` names and commit messages. Norwegian appears only inside quotes, as text shown to the user. If it is not in quotes, it is English.
+- **All code is English**: function names, variables, data fields, file names, CSS classes, `data-action` names and commit messages. Norwegian appears only inside quotes, as text shown to the user. If it is not in quotes, it is English.
 - Anything a user typed goes through `escapeHtml` before it reaches `innerHTML`, and image URLs go through `safeImageUrl`.
-- A listing nests contact details under `seller` and the place under `location`, but `FormData` is flat — the form uses `sellerName`, `sellerPhone`, `sellerEmail`, `city` and `zip`, and `model.addListing` assembles both objects. Rename a field in one place and you must rename it in the other; nothing will warn you.
+- A listing nests contact details under `seller` and the place under `location`, but `FormData` is flat. The form uses `sellerName`, `sellerPhone`, `sellerEmail`, `city` and `zip`, and `model.addListing` assembles both objects. Rename a field in one place and you must rename it in the other; nothing will warn you.
 - Seed sellers must never look like real people. Phone numbers run `+47 400 00 00X` and emails use `example.com`, which RFC 2606 reserves for documentation. The repository is public.
 - Accessibility is part of done, not a pass at the end: every screen has one `<h1>`, every field has a label, every icon button has an `aria-label`, and `#status` in `index.html` announces result counts.
 - CSS is mobile-first. Breakpoints: `768px` for tablet, `1024px` for desktop.
@@ -124,8 +124,8 @@ The design document is in [docs/2026-08-06-funn-design.md](docs/2026-08-06-funn-
 
 ## Brand
 
-Logos, icons, colours and usage rules live in [docs/brand](docs/brand) —
-start with [BRAND_GUIDELINES.md](docs/brand/BRAND_GUIDELINES.md).
+Logos, icons, colours and usage rules live in [docs/brand](docs/brand).
+Start with [BRAND_GUIDELINES.md](docs/brand/BRAND_GUIDELINES.md).
 
 The palette in `docs/brand/funn-brand-tokens.css` is the source of truth for
 the `:root` block at the top of `src/style.css`. Change it there first, then
@@ -133,7 +133,7 @@ mirror it into the stylesheet; nothing syncs the two automatically.
 
 Blue (`#2F81F7`) is the product colour: buttons, prices, links and focus
 rings. Cyan, violet and pink exist only for the brand gradient, which is
-decorative — it appears once, as the line under the top bar, and never
+decorative. It appears once, as the line under the top bar, and never
 behind text. Violet in particular measures 4.47:1 against the background,
 just under the 4.5:1 that body text needs.
 
